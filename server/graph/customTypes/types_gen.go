@@ -2,6 +2,19 @@
 
 package customTypes
 
+type Book struct {
+	ID        int    `json:"id"`
+	Title     string `json:"title"`
+	Author    string `json:"author"`
+	Publisher string `json:"publisher"`
+}
+
+type BookInput struct {
+	Title     string `json:"title"`
+	Author    string `json:"author"`
+	Publisher string `json:"publisher"`
+}
+
 type Todo struct {
 	ID   int    `json:"id"`
 	Text string `json:"text"`

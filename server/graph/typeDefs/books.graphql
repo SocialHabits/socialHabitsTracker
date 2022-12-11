@@ -1,0 +1,23 @@
+type Book {
+    id: Int!
+    title: String!
+    author: String!
+    publisher: String!
+}
+
+input BookInput{
+    title: String!
+    author: String!
+    publisher: String!
+}
+extend type Mutation{
+    CreateBook(input: BookInput!): Book!
+    DeleteBook(id: Int!): String!
+    UpdateBook(id: Int!): String!
+
+}
+
+extend type Query{
+    GetAllBooks: [Book!]!
+    GetOneBook(id: Int!): Book!
+}
