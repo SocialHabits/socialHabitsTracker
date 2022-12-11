@@ -13,7 +13,19 @@ import (
 
 // CreateBook is the resolver for the CreateBook field.
 func (r *mutationResolver) CreateBook(ctx context.Context, input customTypes.BookInput) (*customTypes.Book, error) {
-	panic(fmt.Errorf("not implemented: CreateBook - CreateBook"))
+	book, err := r.BookRepository.CreateBook(&input)
+
+	bookCreated := &customTypes.Book{
+		Author:    book.Author,
+		Publisher: book.Publisher,
+		Title:     book.Title,
+		ID:        int(book.ID),
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	return bookCreated, nil
 }
 
 // DeleteBook is the resolver for the DeleteBook field.
