@@ -39,21 +39,34 @@ func (b BookService) CreateBook(bookInput *customTypes.BookInput) (*models.Book,
 }
 
 func (b BookService) UpdateBook(bookInput *customTypes.BookInput, id int) error {
-	//TODO implement me
-	panic("implement me")
+	book := models.Book{
+		Title:     bookInput.Title,
+		Author:    bookInput.Author,
+		Publisher: bookInput.Publisher,
+		Model:     gorm.Model{ID: uint(id)},
+	}
+
+	err := b.Db.Model(&book).Where("id = ?", id).Updates(book).Error
+	return err
 }
 
 func (b BookService) DeleteBook(id int) error {
-	//TODO implement me
-	panic("implement me")
+	book := &models.Book{}
+
+	err := b.Db.Delete(book, id).Error
+	return err
 }
 
 func (b BookService) GetOneBook(id int) (*models.Book, error) {
-	//TODO implement me
-	panic("implement me")
+	book := &models.Book{}
+
+	err := b.Db.Where("id = ?", id).First(book).Error
+	return book, err
 }
 
 func (b BookService) GetAllBooks() ([]*customTypes.Book, error) {
-	//TODO implement me
-	panic("implement me")
+	var books []*customTypes.Book
+
+	err := b.Db.Find(&books).Error
+	return books, err
 }
