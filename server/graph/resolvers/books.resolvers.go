@@ -6,6 +6,7 @@ package graph
 
 import (
 	"context"
+
 	"github.com/AntonioTrupac/socialHabitsTracker/graph/customTypes"
 )
 
@@ -37,8 +38,8 @@ func (r *mutationResolver) DeleteBook(ctx context.Context, id int) (string, erro
 }
 
 // UpdateBook is the resolver for the UpdateBook field.
-func (r *mutationResolver) UpdateBook(ctx context.Context, id int) (string, error) {
-	err := r.BookRepository.UpdateBook(&customTypes.BookInput{}, id)
+func (r *mutationResolver) UpdateBook(ctx context.Context, id int, input customTypes.BookInput) (string, error) {
+	err := r.BookRepository.UpdateBook(&input, id)
 
 	if err != nil {
 		return "nil", err
