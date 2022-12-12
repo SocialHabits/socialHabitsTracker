@@ -6,8 +6,6 @@ package graph
 
 import (
 	"context"
-	"fmt"
-
 	"github.com/AntonioTrupac/socialHabitsTracker/graph/customTypes"
 )
 
@@ -30,20 +28,46 @@ func (r *mutationResolver) CreateBook(ctx context.Context, input customTypes.Boo
 
 // DeleteBook is the resolver for the DeleteBook field.
 func (r *mutationResolver) DeleteBook(ctx context.Context, id int) (string, error) {
-	panic(fmt.Errorf("not implemented: DeleteBook - DeleteBook"))
+	err := r.BookRepository.DeleteBook(id)
+	if err != nil {
+		return "", err
+	}
+	successMessage := "successfully deleted"
+	return successMessage, nil
 }
 
 // UpdateBook is the resolver for the UpdateBook field.
 func (r *mutationResolver) UpdateBook(ctx context.Context, id int) (string, error) {
-	panic(fmt.Errorf("not implemented: UpdateBook - UpdateBook"))
+	err := r.BookRepository.UpdateBook(&customTypes.BookInput{}, id)
+
+	if err != nil {
+		return "nil", err
+	}
+	successMessage := "successfully updated"
+
+	return successMessage, nil
 }
 
 // GetAllBooks is the resolver for the GetAllBooks field.
 func (r *queryResolver) GetAllBooks(ctx context.Context) ([]*customTypes.Book, error) {
-	panic(fmt.Errorf("not implemented: GetAllBooks - GetAllBooks"))
+	books, err := r.BookRepository.GetAllBooks()
+	if err != nil {
+		return nil, err
+	}
+	return books, nil
 }
 
 // GetOneBook is the resolver for the GetOneBook field.
 func (r *queryResolver) GetOneBook(ctx context.Context, id int) (*customTypes.Book, error) {
-	panic(fmt.Errorf("not implemented: GetOneBook - GetOneBook"))
+	book, err := r.BookRepository.GetOneBook(id)
+	selectedBook := &customTypes.Book{
+		ID:        int(book.ID),
+		Author:    book.Author,
+		Publisher: book.Publisher,
+		Title:     book.Title,
+	}
+	if err != nil {
+		return nil, err
+	}
+	return selectedBook, nil
 }
