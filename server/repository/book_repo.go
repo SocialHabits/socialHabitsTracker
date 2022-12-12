@@ -43,7 +43,7 @@ func (b BookService) UpdateBook(bookInput *customTypes.BookInput, id int) error 
 		Title:     bookInput.Title,
 		Author:    bookInput.Author,
 		Publisher: bookInput.Publisher,
-		Model:     gorm.Model{ID: uint(id)},
+		ID:        uint(id),
 	}
 
 	err := b.Db.Model(&book).Where("id = ?", id).Updates(book).Error

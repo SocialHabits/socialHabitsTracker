@@ -1,8 +1,12 @@
 package main
 
 import (
+	"github.com/AntonioTrupac/socialHabitsTracker/database"
 	generated "github.com/AntonioTrupac/socialHabitsTracker/graph"
 	resolvers "github.com/AntonioTrupac/socialHabitsTracker/graph/resolvers"
+	"github.com/AntonioTrupac/socialHabitsTracker/models"
+	"github.com/AntonioTrupac/socialHabitsTracker/repository"
+	"github.com/joho/godotenv"
 
 	"log"
 	"net/http"
@@ -15,12 +19,26 @@ import (
 const defaultPort = "8080"
 
 func main() {
+	err := godotenv.Load(".env")
+
+	db, err := database.InitDb()
+
+	if err != nil {
+		panic(err)
+	}
+
+	db.AutoMigrate(&models.Book{})
+
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = defaultPort
 	}
 
-	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &resolvers.Resolver{}}))
+	bookRepo := repository.NewBookService(db)
+
+	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &resolvers.Resolver{
+		BookRepository: bookRepo,
+	}}))
 
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	http.Handle("/query", srv)
