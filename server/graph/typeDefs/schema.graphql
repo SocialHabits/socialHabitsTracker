@@ -1,0 +1,11 @@
+directive @goField(
+    forceResolver: Boolean
+    name: String
+) on FIELD_DEFINITION | INPUT_FIELD_DEFINITION
+
+scalar Any
+
+schema {
+    query: Query
+    mutation: Mutation
+}

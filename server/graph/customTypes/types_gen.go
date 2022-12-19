@@ -2,6 +2,20 @@
 
 package customTypes
 
+type Address struct {
+	ID      int    `json:"id"`
+	Street  string `json:"street"`
+	City    string `json:"city"`
+	Country string `json:"country"`
+	UserID  int    `json:"userId"`
+}
+
+type AddressInput struct {
+	Street  string `json:"street"`
+	City    string `json:"city"`
+	Country string `json:"country"`
+}
+
 type Book struct {
 	ID        int    `json:"id"`
 	Title     string `json:"title"`
@@ -15,6 +29,11 @@ type BookInput struct {
 	Publisher string `json:"publisher"`
 }
 
+type Role struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+}
+
 type Todo struct {
 	ID   int    `json:"id"`
 	Text string `json:"text"`
@@ -25,4 +44,22 @@ type TodoInput struct {
 	ID   int    `json:"id"`
 	Text string `json:"text"`
 	Done bool   `json:"done"`
+}
+
+type User struct {
+	ID        int        `json:"id"`
+	FirstName string     `json:"firstName"`
+	LastName  string     `json:"lastName"`
+	Email     string     `json:"email"`
+	Password  string     `json:"password"`
+	Address   []*Address `json:"Address"`
+	Role      []*Role    `json:"Role"`
+}
+
+type UserInput struct {
+	FirstName string          `json:"firstName"`
+	LastName  string          `json:"lastName"`
+	Email     string          `json:"email"`
+	Password  string          `json:"password"`
+	Address   []*AddressInput `json:"address"`
 }
