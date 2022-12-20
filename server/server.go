@@ -27,7 +27,7 @@ func main() {
 		panic(err)
 	}
 
-	db.AutoMigrate(&models.Book{})
+	db.AutoMigrate(&models.Book{}, &models.User{}, &models.Address{}, &models.Role{})
 
 	port := os.Getenv("PORT")
 	if port == "" {
@@ -35,9 +35,11 @@ func main() {
 	}
 
 	bookRepo := repository.NewBookService(db)
+	userRepo := repository.NewUserService(db)
 
 	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &resolvers.Resolver{
 		BookRepository: bookRepo,
+		UserRepository: userRepo,
 	}}))
 
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))

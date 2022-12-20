@@ -33,6 +33,7 @@ input AddressInput {
     street: String!
     city: String!
     country: String!
+    UserId: ID!
 }
 
 extend type Query {
