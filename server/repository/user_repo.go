@@ -61,14 +61,14 @@ func (u UserService) CreateUser(userInput *customTypes.UserInput) (*models.User,
 	}
 
 	err := u.Db.Transaction(func(tx *gorm.DB) error {
-		userInput.Password = util.HashPassword(userInput.Password)
+		user.Password = util.HashPassword(userInput.Password)
 
 		if err := tx.Omit(clause.Associations).Create(user).Error; err != nil {
 			return err
 		}
 
 		for _, value := range user.Address {
-			value.ID = user.ID
+			value.UserID = user.ID
 		}
 
 		if err := tx.CreateInBatches(user.Address, 100).Error; err != nil {
