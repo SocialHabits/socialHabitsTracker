@@ -5,7 +5,7 @@ type User {
     email: String!
     password: String!
     Address: [Address!]!
-    Role: [Role!]!
+    Role: [Role]
 }
 
 type Address {
@@ -33,7 +33,6 @@ input AddressInput {
     street: String!
     city: String!
     country: String!
-    UserId: ID!
 }
 
 extend type Query {
