@@ -70,6 +70,18 @@ func mapAddressInput(addressInput []*customTypes.AddressInput) []*models.Address
 	return addresses
 }
 
+func mapRolesInput(roleInput []*customTypes.RoleInput) []models.Role {
+	var roles []models.Role
+
+	for _, role := range roleInput {
+		roles = append(roles, models.Role{
+			Name: role.Name,
+		})
+	}
+
+	return roles
+}
+
 func (u UserService) CreateUser(userInput *customTypes.UserInput) (*models.User, error) {
 	user := &models.User{
 		FirstName: userInput.FirstName,
@@ -77,10 +89,16 @@ func (u UserService) CreateUser(userInput *customTypes.UserInput) (*models.User,
 		Email:     userInput.Email,
 		Password:  userInput.Password,
 		Address:   mapAddressInput(userInput.Address),
+		Roles:     mapRolesInput(userInput.Role),
 	}
 
 	err := u.Db.Transaction(func(tx *gorm.DB) error {
 		user.Password = util.HashPassword(userInput.Password)
+
+		// insert into users table
+		if err := tx.Model(&user).Association("Roles").Append(user.Roles); err != nil {
+			return err
+		}
 
 		if err := tx.Omit(clause.Associations).Create(user).Error; err != nil {
 			return err
