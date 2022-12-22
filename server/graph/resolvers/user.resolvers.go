@@ -7,6 +7,7 @@ package graph
 import (
 	"context"
 	"fmt"
+	"github.com/AntonioTrupac/socialHabitsTracker/models"
 
 	"github.com/AntonioTrupac/socialHabitsTracker/graph/customTypes"
 )
@@ -46,7 +47,40 @@ func (r *queryResolver) GetUser(ctx context.Context, id int) (*customTypes.User,
 	panic(fmt.Errorf("not implemented: GetUser - getUser"))
 }
 
+func mapAddressModelToInput(addressesModel []*models.Address) []*customTypes.Address {
+	var addresses []*customTypes.Address
+
+	for _, address := range addressesModel {
+		addresses = append(addresses, &customTypes.Address{
+			City:    address.City,
+			Country: address.Country,
+			Street:  address.Street,
+		})
+	}
+
+	return addresses
+}
+
 // GetUsers is the resolver for the getUsers field.
 func (r *queryResolver) GetUsers(ctx context.Context) ([]*customTypes.User, error) {
-	panic(fmt.Errorf("not implemented: GetUsers - getUsers"))
+	var users []*customTypes.User
+	usersRepo, err := r.UserRepository.GetUsers()
+
+	for _, u := range usersRepo {
+		users = append(users, &customTypes.User{
+			FirstName: u.FirstName,
+			LastName:  u.LastName,
+			Email:     u.Email,
+			Password:  u.Password,
+			Role:      nil,
+			ID:        int(u.ID),
+			Address:   mapAddressModelToInput(u.Address),
+		})
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	return users, nil
 }

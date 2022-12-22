@@ -33,8 +33,11 @@ func (u UserService) GetUserById(id int) (*models.User, error) {
 }
 
 func (u UserService) GetUsers() ([]*models.User, error) {
-	//TODO implement me
-	panic("implement me")
+	var books []*models.User
+
+	err := u.Db.Preload("addresses").Find(&books).Error
+
+	return books, err
 }
 
 func mapAddressInput(addressInput []*customTypes.AddressInput) []*models.Address {
