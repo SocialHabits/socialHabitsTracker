@@ -35,7 +35,7 @@ func (u UserService) GetUserById(id int) (*models.User, error) {
 func (u UserService) GetUsers() ([]*models.User, error) {
 	var users []*models.User
 
-	err := u.Db.Preload("Address").Find(&users).Error
+	err := u.Db.Model(&models.User{}).Preload("Address").Find(&users).Error
 
 	return users, err
 }

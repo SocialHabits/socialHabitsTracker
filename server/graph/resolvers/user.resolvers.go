@@ -47,7 +47,7 @@ func (r *queryResolver) GetUser(ctx context.Context, id int) (*customTypes.User,
 	panic(fmt.Errorf("not implemented: GetUser - getUser"))
 }
 
-func mapAddressModelToInput(addressesModel []*models.Address) []*customTypes.Address {
+func mapAddressModelToGqlType(addressesModel []*models.Address) []*customTypes.Address {
 	var addresses []*customTypes.Address
 
 	for _, address := range addressesModel {
@@ -55,6 +55,8 @@ func mapAddressModelToInput(addressesModel []*models.Address) []*customTypes.Add
 			City:    address.City,
 			Country: address.Country,
 			Street:  address.Street,
+			ID:      int(address.ID),
+			UserID:  int(address.UserID),
 		})
 	}
 
@@ -74,7 +76,7 @@ func (r *queryResolver) GetUsers(ctx context.Context) ([]*customTypes.User, erro
 			Password:  u.Password,
 			Role:      nil,
 			ID:        int(u.ID),
-			Address:   mapAddressModelToInput(u.Address),
+			Address:   mapAddressModelToGqlType(u.Address),
 		})
 	}
 
