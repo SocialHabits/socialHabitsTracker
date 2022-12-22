@@ -122,6 +122,17 @@ func (r *queryResolver) GetRoles(ctx context.Context) ([]*customTypes.Role, erro
 }
 
 // GetRole is the resolver for the getRole field.
-func (r *queryResolver) GetRole(ctx context.Context, id int) (*customTypes.Role, error) {
-	panic(fmt.Errorf("not implemented: GetRole - getRole"))
+func (r *queryResolver) GetRole(ctx context.Context, name string) (*customTypes.Role, error) {
+	role, err := r.UserRepository.GetRoleByName(name)
+
+	roleGql := &customTypes.Role{
+		ID:   int(role.ID),
+		Name: role.Name,
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	return roleGql, nil
 }
