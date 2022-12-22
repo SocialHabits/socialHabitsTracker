@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"errors"
+	"fmt"
 	"github.com/AntonioTrupac/socialHabitsTracker/graph/customTypes"
 	"github.com/AntonioTrupac/socialHabitsTracker/models"
 	"github.com/AntonioTrupac/socialHabitsTracker/util"
@@ -28,14 +30,25 @@ func NewUserService(db *gorm.DB) *UserService {
 }
 
 func (u UserService) GetUserById(id int) (*models.User, error) {
-	//TODO implement me
-	panic("implement me")
+	var user models.User
+
+	err := u.Db.Model(&models.User{}).Preload("Address").Where("id = ?", id).First(&user).Error
+
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		fmt.Printf("User with id %d not found", id)
+	}
+
+	return &user, err
 }
 
 func (u UserService) GetUsers() ([]*models.User, error) {
 	var users []*models.User
 
 	err := u.Db.Model(&models.User{}).Preload("Address").Find(&users).Error
+
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		fmt.Printf("No users found")
+	}
 
 	return users, err
 }

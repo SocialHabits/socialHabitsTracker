@@ -44,7 +44,45 @@ func (r *mutationResolver) DeleteUser(ctx context.Context, id int) (*customTypes
 
 // GetUser is the resolver for the getUser field.
 func (r *queryResolver) GetUser(ctx context.Context, id int) (*customTypes.User, error) {
-	panic(fmt.Errorf("not implemented: GetUser - getUser"))
+	user, err := r.UserRepository.GetUserById(id)
+
+	userGql := &customTypes.User{
+		FirstName: user.FirstName,
+		LastName:  user.LastName,
+		Email:     user.Email,
+		Role:      nil,
+		ID:        int(user.ID),
+		Address:   mapAddressModelToGqlType(user.Address),
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	return userGql, nil
+}
+
+// GetUsers is the resolver for the getUsers field.
+func (r *queryResolver) GetUsers(ctx context.Context) ([]*customTypes.User, error) {
+	var usersGql []*customTypes.User
+	usersRepo, err := r.UserRepository.GetUsers()
+
+	for _, u := range usersRepo {
+		usersGql = append(usersGql, &customTypes.User{
+			FirstName: u.FirstName,
+			LastName:  u.LastName,
+			Email:     u.Email,
+			Role:      nil,
+			ID:        int(u.ID),
+			Address:   mapAddressModelToGqlType(u.Address),
+		})
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	return usersGql, nil
 }
 
 func mapAddressModelToGqlType(addressesModel []*models.Address) []*customTypes.Address {
@@ -61,28 +99,4 @@ func mapAddressModelToGqlType(addressesModel []*models.Address) []*customTypes.A
 	}
 
 	return addresses
-}
-
-// GetUsers is the resolver for the getUsers field.
-func (r *queryResolver) GetUsers(ctx context.Context) ([]*customTypes.User, error) {
-	var users []*customTypes.User
-	usersRepo, err := r.UserRepository.GetUsers()
-
-	for _, u := range usersRepo {
-		users = append(users, &customTypes.User{
-			FirstName: u.FirstName,
-			LastName:  u.LastName,
-			Email:     u.Email,
-			Password:  u.Password,
-			Role:      nil,
-			ID:        int(u.ID),
-			Address:   mapAddressModelToGqlType(u.Address),
-		})
-	}
-
-	if err != nil {
-		return nil, err
-	}
-
-	return users, nil
 }
