@@ -47,6 +47,7 @@ func (r *mutationResolver) CreateRole(ctx context.Context, input customTypes.Rol
 	role, err := r.UserRepository.CreateRole(&input)
 
 	createdRole := &customTypes.Role{
+		ID:   int(role.ID),
 		Name: role.Name,
 	}
 
@@ -102,7 +103,22 @@ func (r *queryResolver) GetUsers(ctx context.Context) ([]*customTypes.User, erro
 
 // GetRoles is the resolver for the getRoles field.
 func (r *queryResolver) GetRoles(ctx context.Context) ([]*customTypes.Role, error) {
-	panic(fmt.Errorf("not implemented: GetRoles - getRoles"))
+	roles, err := r.UserRepository.GetRoles()
+
+	var rolesGql []*customTypes.Role
+
+	for _, r := range roles {
+		rolesGql = append(rolesGql, &customTypes.Role{
+			ID:   int(r.ID),
+			Name: r.Name,
+		})
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	return rolesGql, nil
 }
 
 // GetRole is the resolver for the getRole field.

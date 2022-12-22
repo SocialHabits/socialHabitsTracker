@@ -438,7 +438,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Todo.Text(childComplexity), true
 
-	case "User.Address":
+	case "User.address":
 		if e.complexity.User.Address == nil {
 			break
 		}
@@ -480,7 +480,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.User.Password(childComplexity), true
 
-	case "User.Role":
+	case "User.role":
 		if e.complexity.User.Role == nil {
 			break
 		}
@@ -1672,10 +1672,10 @@ func (ec *executionContext) fieldContext_Mutation_createUser(ctx context.Context
 				return ec.fieldContext_User_email(ctx, field)
 			case "password":
 				return ec.fieldContext_User_password(ctx, field)
-			case "Address":
-				return ec.fieldContext_User_Address(ctx, field)
-			case "Role":
-				return ec.fieldContext_User_Role(ctx, field)
+			case "address":
+				return ec.fieldContext_User_address(ctx, field)
+			case "role":
+				return ec.fieldContext_User_role(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -1743,10 +1743,10 @@ func (ec *executionContext) fieldContext_Mutation_updateUser(ctx context.Context
 				return ec.fieldContext_User_email(ctx, field)
 			case "password":
 				return ec.fieldContext_User_password(ctx, field)
-			case "Address":
-				return ec.fieldContext_User_Address(ctx, field)
-			case "Role":
-				return ec.fieldContext_User_Role(ctx, field)
+			case "address":
+				return ec.fieldContext_User_address(ctx, field)
+			case "role":
+				return ec.fieldContext_User_role(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -1814,10 +1814,10 @@ func (ec *executionContext) fieldContext_Mutation_deleteUser(ctx context.Context
 				return ec.fieldContext_User_email(ctx, field)
 			case "password":
 				return ec.fieldContext_User_password(ctx, field)
-			case "Address":
-				return ec.fieldContext_User_Address(ctx, field)
-			case "Role":
-				return ec.fieldContext_User_Role(ctx, field)
+			case "address":
+				return ec.fieldContext_User_address(ctx, field)
+			case "role":
+				return ec.fieldContext_User_role(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -2180,10 +2180,10 @@ func (ec *executionContext) fieldContext_Query_getUser(ctx context.Context, fiel
 				return ec.fieldContext_User_email(ctx, field)
 			case "password":
 				return ec.fieldContext_User_password(ctx, field)
-			case "Address":
-				return ec.fieldContext_User_Address(ctx, field)
-			case "Role":
-				return ec.fieldContext_User_Role(ctx, field)
+			case "address":
+				return ec.fieldContext_User_address(ctx, field)
+			case "role":
+				return ec.fieldContext_User_role(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -2251,10 +2251,10 @@ func (ec *executionContext) fieldContext_Query_getUsers(ctx context.Context, fie
 				return ec.fieldContext_User_email(ctx, field)
 			case "password":
 				return ec.fieldContext_User_password(ctx, field)
-			case "Address":
-				return ec.fieldContext_User_Address(ctx, field)
-			case "Role":
-				return ec.fieldContext_User_Role(ctx, field)
+			case "address":
+				return ec.fieldContext_User_address(ctx, field)
+			case "role":
+				return ec.fieldContext_User_role(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -2942,8 +2942,8 @@ func (ec *executionContext) fieldContext_User_password(ctx context.Context, fiel
 	return fc, nil
 }
 
-func (ec *executionContext) _User_Address(ctx context.Context, field graphql.CollectedField, obj *customTypes.User) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_User_Address(ctx, field)
+func (ec *executionContext) _User_address(ctx context.Context, field graphql.CollectedField, obj *customTypes.User) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_User_address(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2973,7 +2973,7 @@ func (ec *executionContext) _User_Address(ctx context.Context, field graphql.Col
 	return ec.marshalNAddress2ᚕᚖgithubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐAddressᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_User_Address(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_User_address(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "User",
 		Field:      field,
@@ -2998,8 +2998,8 @@ func (ec *executionContext) fieldContext_User_Address(ctx context.Context, field
 	return fc, nil
 }
 
-func (ec *executionContext) _User_Role(ctx context.Context, field graphql.CollectedField, obj *customTypes.User) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_User_Role(ctx, field)
+func (ec *executionContext) _User_role(ctx context.Context, field graphql.CollectedField, obj *customTypes.User) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_User_role(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -3026,7 +3026,7 @@ func (ec *executionContext) _User_Role(ctx context.Context, field graphql.Collec
 	return ec.marshalORole2ᚕᚖgithubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐRole(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_User_Role(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_User_role(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "User",
 		Field:      field,
@@ -4985,7 +4985,7 @@ func (ec *executionContext) unmarshalInputUserInput(ctx context.Context, obj int
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"firstName", "lastName", "email", "password", "address"}
+	fieldsInOrder := [...]string{"firstName", "lastName", "email", "password", "address", "role"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -5029,6 +5029,14 @@ func (ec *executionContext) unmarshalInputUserInput(ctx context.Context, obj int
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("address"))
 			it.Address, err = ec.unmarshalNAddressInput2ᚕᚖgithubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐAddressInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "role":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("role"))
+			it.Role, err = ec.unmarshalORoleInput2ᚕᚖgithubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐRoleInput(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -5619,16 +5627,16 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "Address":
+		case "address":
 
-			out.Values[i] = ec._User_Address(ctx, field, obj)
+			out.Values[i] = ec._User_address(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "Role":
+		case "role":
 
-			out.Values[i] = ec._User_Role(ctx, field, obj)
+			out.Values[i] = ec._User_role(ctx, field, obj)
 
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -6672,6 +6680,34 @@ func (ec *executionContext) marshalORole2ᚖgithubᚗcomᚋAntonioTrupacᚋsocia
 		return graphql.Null
 	}
 	return ec._Role(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalORoleInput2ᚕᚖgithubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐRoleInput(ctx context.Context, v interface{}) ([]*customTypes.RoleInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*customTypes.RoleInput, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalORoleInput2ᚖgithubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐRoleInput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalORoleInput2ᚖgithubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐRoleInput(ctx context.Context, v interface{}) (*customTypes.RoleInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputRoleInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalOString2ᚖstring(ctx context.Context, v interface{}) (*string, error) {

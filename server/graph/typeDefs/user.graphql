@@ -4,8 +4,8 @@ type User {
     lastName: String!
     email: String!
     password: String!
-    Address: [Address!]!
-    Role: [Role]
+    address: [Address!]!
+    role: [Role]
 }
 
 type Address {
@@ -27,6 +27,7 @@ input UserInput {
     email: String!
     password: String!
     address: [AddressInput!]!
+    role: [RoleInput]
 }
 
 input AddressInput {
@@ -43,7 +44,7 @@ extend type Query {
     getUser(id: ID!): User!
     getUsers: [User!]!
     getRoles: [Role!]!
-    getRole(id: ID!): Role!
+    getRole(name: String!): Role!
 }
 
 extend type Mutation {
