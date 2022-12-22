@@ -14,6 +14,9 @@ type UserRepository interface {
 	GetUserById(id int) (*models.User, error)
 	GetUsers() ([]*models.User, error)
 	CreateUser(userInput *customTypes.UserInput) (*models.User, error)
+	GetRoles() ([]*models.Role, error)
+	GetRoleByName(name string) (*models.Role, error)
+	CreateRole(roleInput *customTypes.RoleInput) (*models.Role, error)
 	// UpdateUser(userInput *customTypes.UserInput, id int) error
 }
 
@@ -99,4 +102,42 @@ func (u UserService) CreateUser(userInput *customTypes.UserInput) (*models.User,
 	}
 
 	return user, nil
+}
+
+func (u UserService) GetRoles() ([]*models.Role, error) {
+	var roles []*models.Role
+
+	err := u.Db.Model(&models.Role{}).Find(&roles).Error
+
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		fmt.Printf("No roles found")
+	}
+
+	return roles, err
+}
+
+func (u UserService) GetRoleByName(name string) (*models.Role, error) {
+	var role models.Role
+
+	err := u.Db.Model(&models.Role{}).Where("name = ?", name).First(&role).Error
+
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		fmt.Printf("Role with name %s not found", name)
+	}
+
+	return &role, err
+}
+
+func (u UserService) CreateRole(roleInput *customTypes.RoleInput) (*models.Role, error) {
+	role := &models.Role{
+		Name: roleInput.Name,
+	}
+
+	err := u.Db.Create(role).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return role, nil
 }

@@ -62,6 +62,7 @@ type ComplexityRoot struct {
 
 	Mutation struct {
 		CreateBook func(childComplexity int, input customTypes.BookInput) int
+		CreateRole func(childComplexity int, input customTypes.RoleInput) int
 		CreateTodo func(childComplexity int, text string) int
 		CreateUser func(childComplexity int, input customTypes.UserInput) int
 		DeleteBook func(childComplexity int, id int) int
@@ -75,6 +76,8 @@ type ComplexityRoot struct {
 	Query struct {
 		GetAllBooks func(childComplexity int) int
 		GetOneBook  func(childComplexity int, id int) int
+		GetRole     func(childComplexity int, id int) int
+		GetRoles    func(childComplexity int) int
 		GetTodo     func(childComplexity int, todoID int) int
 		GetTodos    func(childComplexity int) int
 		GetUser     func(childComplexity int, id int) int
@@ -113,6 +116,7 @@ type MutationResolver interface {
 	CreateUser(ctx context.Context, input customTypes.UserInput) (*customTypes.User, error)
 	UpdateUser(ctx context.Context, id int, input customTypes.UserInput) (*customTypes.User, error)
 	DeleteUser(ctx context.Context, id int) (*customTypes.User, error)
+	CreateRole(ctx context.Context, input customTypes.RoleInput) (*customTypes.Role, error)
 }
 type QueryResolver interface {
 	GetTodos(ctx context.Context) ([]*customTypes.Todo, error)
@@ -121,6 +125,8 @@ type QueryResolver interface {
 	GetOneBook(ctx context.Context, id int) (*customTypes.Book, error)
 	GetUser(ctx context.Context, id int) (*customTypes.User, error)
 	GetUsers(ctx context.Context) ([]*customTypes.User, error)
+	GetRoles(ctx context.Context) ([]*customTypes.Role, error)
+	GetRole(ctx context.Context, id int) (*customTypes.Role, error)
 }
 
 type executableSchema struct {
@@ -212,6 +218,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.CreateBook(childComplexity, args["input"].(customTypes.BookInput)), true
+
+	case "Mutation.createRole":
+		if e.complexity.Mutation.CreateRole == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createRole_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateRole(childComplexity, args["input"].(customTypes.RoleInput)), true
 
 	case "Mutation.createTodo":
 		if e.complexity.Mutation.CreateTodo == nil {
@@ -327,6 +345,25 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.GetOneBook(childComplexity, args["id"].(int)), true
+
+	case "Query.getRole":
+		if e.complexity.Query.GetRole == nil {
+			break
+		}
+
+		args, err := ec.field_Query_getRole_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetRole(childComplexity, args["id"].(int)), true
+
+	case "Query.getRoles":
+		if e.complexity.Query.GetRoles == nil {
+			break
+		}
+
+		return e.complexity.Query.GetRoles(childComplexity), true
 
 	case "Query.getTodo":
 		if e.complexity.Query.GetTodo == nil {
@@ -460,6 +497,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputAddressInput,
 		ec.unmarshalInputBookInput,
+		ec.unmarshalInputRoleInput,
 		ec.unmarshalInputTodoInput,
 		ec.unmarshalInputUserInput,
 	)
@@ -598,6 +636,21 @@ func (ec *executionContext) field_Mutation_UpdateBook_args(ctx context.Context, 
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_createRole_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 customTypes.RoleInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNRoleInput2githubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐRoleInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_createTodo_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -724,6 +777,21 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 		}
 	}
 	args["name"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_getRole_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 int
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
 	return args, nil
 }
 
@@ -1768,6 +1836,67 @@ func (ec *executionContext) fieldContext_Mutation_deleteUser(ctx context.Context
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_createRole(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_createRole(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CreateRole(rctx, fc.Args["input"].(customTypes.RoleInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*customTypes.Role)
+	fc.Result = res
+	return ec.marshalNRole2ᚖgithubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐRole(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_createRole(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Role_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Role_name(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Role", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_createRole_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query_getTodos(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Query_getTodos(ctx, field)
 	if err != nil {
@@ -2129,6 +2258,117 @@ func (ec *executionContext) fieldContext_Query_getUsers(ctx context.Context, fie
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_getRoles(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_getRoles(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().GetRoles(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*customTypes.Role)
+	fc.Result = res
+	return ec.marshalNRole2ᚕᚖgithubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐRoleᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_getRoles(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Role_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Role_name(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Role", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_getRole(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_getRole(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().GetRole(rctx, fc.Args["id"].(int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*customTypes.Role)
+	fc.Result = res
+	return ec.marshalNRole2ᚖgithubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐRole(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_getRole(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Role_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Role_name(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Role", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_getRole_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
 	}
 	return fc, nil
 }
@@ -4666,6 +4906,34 @@ func (ec *executionContext) unmarshalInputBookInput(ctx context.Context, obj int
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputRoleInput(ctx context.Context, obj interface{}) (customTypes.RoleInput, error) {
+	var it customTypes.RoleInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"name"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "name":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			it.Name, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputTodoInput(ctx context.Context, obj interface{}) (customTypes.TodoInput, error) {
 	var it customTypes.TodoInput
 	asMap := map[string]interface{}{}
@@ -4983,6 +5251,15 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "createRole":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createRole(ctx, field)
+			})
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -5138,6 +5415,52 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_getUsers(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
+			})
+		case "getRoles":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getRoles(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
+			})
+		case "getRole":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getRole(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
@@ -5818,6 +6141,69 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) marshalNRole2githubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐRole(ctx context.Context, sel ast.SelectionSet, v customTypes.Role) graphql.Marshaler {
+	return ec._Role(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNRole2ᚕᚖgithubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐRoleᚄ(ctx context.Context, sel ast.SelectionSet, v []*customTypes.Role) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNRole2ᚖgithubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐRole(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNRole2ᚖgithubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐRole(ctx context.Context, sel ast.SelectionSet, v *customTypes.Role) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._Role(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNRoleInput2githubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐRoleInput(ctx context.Context, v interface{}) (customTypes.RoleInput, error) {
+	res, err := ec.unmarshalInputRoleInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {

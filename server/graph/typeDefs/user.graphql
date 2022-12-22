@@ -35,13 +35,20 @@ input AddressInput {
     country: String!
 }
 
+input RoleInput {
+    name: String!
+}
+
 extend type Query {
     getUser(id: ID!): User!
     getUsers: [User!]!
+    getRoles: [Role!]!
+    getRole(id: ID!): Role!
 }
 
 extend type Mutation {
     createUser(input: UserInput!): User!
     updateUser(id: ID!, input: UserInput!): User!
     deleteUser(id: ID!): User!
+    createRole(input: RoleInput!): Role!
 }

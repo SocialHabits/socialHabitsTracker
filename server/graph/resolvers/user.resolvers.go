@@ -7,8 +7,8 @@ package graph
 import (
 	"context"
 	"fmt"
-	"github.com/AntonioTrupac/socialHabitsTracker/models"
 
+	generated "github.com/AntonioTrupac/socialHabitsTracker/graph"
 	"github.com/AntonioTrupac/socialHabitsTracker/graph/customTypes"
 )
 
@@ -16,7 +16,7 @@ import (
 func (r *mutationResolver) CreateUser(ctx context.Context, input customTypes.UserInput) (*customTypes.User, error) {
 	user, err := r.UserRepository.CreateUser(&input)
 
-	userCreated := &customTypes.User{
+	createdUser := &customTypes.User{
 		FirstName: user.FirstName,
 		LastName:  user.LastName,
 		Email:     user.Email,
@@ -29,7 +29,7 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input customTypes.Use
 		return nil, err
 	}
 
-	return userCreated, nil
+	return createdUser, nil
 }
 
 // UpdateUser is the resolver for the updateUser field.
@@ -42,6 +42,21 @@ func (r *mutationResolver) DeleteUser(ctx context.Context, id int) (*customTypes
 	panic(fmt.Errorf("not implemented: DeleteUser - deleteUser"))
 }
 
+// CreateRole is the resolver for the createRole field.
+func (r *mutationResolver) CreateRole(ctx context.Context, input customTypes.RoleInput) (*customTypes.Role, error) {
+	role, err := r.UserRepository.CreateRole(&input)
+
+	createdRole := &customTypes.Role{
+		Name: role.Name,
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	return createdRole, nil
+}
+
 // GetUser is the resolver for the getUser field.
 func (r *queryResolver) GetUser(ctx context.Context, id int) (*customTypes.User, error) {
 	user, err := r.UserRepository.GetUserById(id)
@@ -52,7 +67,7 @@ func (r *queryResolver) GetUser(ctx context.Context, id int) (*customTypes.User,
 		Email:     user.Email,
 		Role:      nil,
 		ID:        int(user.ID),
-		Address:   mapAddressModelToGqlType(user.Address),
+		Address:   generated.MapAddressModelToGqlType(user.Address),
 	}
 
 	if err != nil {
@@ -74,7 +89,7 @@ func (r *queryResolver) GetUsers(ctx context.Context) ([]*customTypes.User, erro
 			Email:     u.Email,
 			Role:      nil,
 			ID:        int(u.ID),
-			Address:   mapAddressModelToGqlType(u.Address),
+			Address:   generated.MapAddressModelToGqlType(u.Address),
 		})
 	}
 
@@ -85,18 +100,12 @@ func (r *queryResolver) GetUsers(ctx context.Context) ([]*customTypes.User, erro
 	return usersGql, nil
 }
 
-func mapAddressModelToGqlType(addressesModel []*models.Address) []*customTypes.Address {
-	var addresses []*customTypes.Address
+// GetRoles is the resolver for the getRoles field.
+func (r *queryResolver) GetRoles(ctx context.Context) ([]*customTypes.Role, error) {
+	panic(fmt.Errorf("not implemented: GetRoles - getRoles"))
+}
 
-	for _, address := range addressesModel {
-		addresses = append(addresses, &customTypes.Address{
-			City:    address.City,
-			Country: address.Country,
-			Street:  address.Street,
-			ID:      int(address.ID),
-			UserID:  int(address.UserID),
-		})
-	}
-
-	return addresses
+// GetRole is the resolver for the getRole field.
+func (r *queryResolver) GetRole(ctx context.Context, id int) (*customTypes.Role, error) {
+	panic(fmt.Errorf("not implemented: GetRole - getRole"))
 }

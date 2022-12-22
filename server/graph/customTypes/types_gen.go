@@ -34,6 +34,10 @@ type Role struct {
 	Name string `json:"name"`
 }
 
+type RoleInput struct {
+	Name string `json:"name"`
+}
+
 type Todo struct {
 	ID   int    `json:"id"`
 	Text string `json:"text"`
