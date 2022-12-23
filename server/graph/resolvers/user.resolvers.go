@@ -7,6 +7,7 @@ package graph
 import (
 	"context"
 	"fmt"
+	"github.com/AntonioTrupac/socialHabitsTracker/models"
 
 	generated "github.com/AntonioTrupac/socialHabitsTracker/graph"
 	"github.com/AntonioTrupac/socialHabitsTracker/graph/customTypes"
@@ -14,6 +15,8 @@ import (
 
 // CreateUser is the resolver for the createUser field.
 func (r *mutationResolver) CreateUser(ctx context.Context, input customTypes.UserInput) (*customTypes.User, error) {
+	// get role
+
 	user, err := r.UserRepository.CreateUser(&input)
 
 	createdUser := &customTypes.User{
@@ -21,7 +24,8 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input customTypes.Use
 		LastName:  user.LastName,
 		Email:     user.Email,
 		Password:  user.Password,
-		Role:      nil,
+		Address:   generated.MapAddressModelToGqlType(user.Address),
+		Role:      MapRoleModelToGqlType(user.Roles),
 		ID:        int(user.ID),
 	}
 
@@ -30,6 +34,19 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input customTypes.Use
 	}
 
 	return createdUser, nil
+}
+
+func MapRoleModelToGqlType(roleModel []*models.Role) []*customTypes.Role {
+	var roles []*customTypes.Role
+
+	for _, r := range roleModel {
+		roles = append(roles, &customTypes.Role{
+			ID:   int(r.ID),
+			Name: r.Name,
+		})
+	}
+
+	return roles
 }
 
 // UpdateUser is the resolver for the updateUser field.

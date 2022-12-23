@@ -56,7 +56,7 @@ func (u UserService) GetUsers() ([]*models.User, error) {
 	return users, err
 }
 
-func mapAddressInput(addressInput []*customTypes.AddressInput) []*models.Address {
+func mapAddressInput(addressInput []*customTypes.AddressInput, id uint) []*models.Address {
 	var addresses []*models.Address
 
 	for _, address := range addressInput {
@@ -64,52 +64,103 @@ func mapAddressInput(addressInput []*customTypes.AddressInput) []*models.Address
 			Street:  address.Street,
 			City:    address.City,
 			Country: address.Country,
+			UserID:  id,
 		})
 	}
 
 	return addresses
 }
 
-func mapRolesInput(roleInput []*customTypes.RoleInput) []models.Role {
-	var roles []models.Role
+//// mapRolesInput maps customTypes.RoleInput to models.Role
+//func mapRolesInput(rolesInput []*customTypes.RoleInput) []*models.Role {
+//	var roles []*models.Role
+//
+//	for _, role := range rolesInput {
+//		roles = append(roles, &models.Role{
+//			Name: role.Name,
+//		})
+//	}
+//
+//	return roles
+//}
 
-	for _, role := range roleInput {
-		roles = append(roles, models.Role{
-			Name: role.Name,
+func mapAddressInputUser(addressInput []*customTypes.AddressInput) []*models.Address {
+	var addresses []*models.Address
+
+	for _, address := range addressInput {
+		addresses = append(addresses, &models.Address{
+			Street:  address.Street,
+			City:    address.City,
+			Country: address.Country,
+			//UserID:  ,
 		})
 	}
 
-	return roles
+	return addresses
 }
 
 func (u UserService) CreateUser(userInput *customTypes.UserInput) (*models.User, error) {
+	var userRoles []*models.UserRoles
+
 	user := &models.User{
 		FirstName: userInput.FirstName,
 		LastName:  userInput.LastName,
 		Email:     userInput.Email,
 		Password:  userInput.Password,
-		Address:   mapAddressInput(userInput.Address),
-		Roles:     mapRolesInput(userInput.Role),
+		//Address:   mapAddressInputUser(userInput.Address),
 	}
 
 	err := u.Db.Transaction(func(tx *gorm.DB) error {
 		user.Password = util.HashPassword(userInput.Password)
 
-		// insert into users table
-		if err := tx.Model(&user).Association("Roles").Append(user.Roles); err != nil {
+		if err := tx.Omit(clause.Associations).Create(&user).Error; err != nil {
 			return err
 		}
 
-		if err := tx.Omit(clause.Associations).Create(user).Error; err != nil {
+		address := mapAddressInput(userInput.Address, user.ID)
+
+		// create address
+		if err := tx.Create(&address).Error; err != nil {
+			fmt.Printf("Error creating address: %v", err)
 			return err
 		}
 
-		for _, value := range user.Address {
+		for _, value := range address {
+			fmt.Println(value.ID)
 			value.UserID = user.ID
 		}
 
-		if err := tx.CreateInBatches(user.Address, 100).Error; err != nil {
+		// user.Address is a slice of pointers to models.Address
+		user.Address = address
+
+		for _, role := range userInput.Role {
+			role, err := u.GetRoleByName(role.Name)
+
+			if err != nil {
+				return err
+			}
+
+			userRoles = append(userRoles, &models.UserRoles{
+				UserID: user.ID,
+				RoleID: role.ID,
+			})
+		}
+
+		// create UserRoles
+		if err := tx.Create(&userRoles).Error; err != nil {
+			fmt.Printf("Error creating user roles: %v", err)
 			return err
+		}
+
+		// add role values to user model
+		for _, role := range userInput.Role {
+			role, err := u.GetRoleByName(role.Name)
+
+			if err != nil {
+				return err
+			}
+
+			user.Roles = append(user.Roles, role)
 		}
 
 		return nil
