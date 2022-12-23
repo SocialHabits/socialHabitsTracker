@@ -119,7 +119,6 @@ func (u UserService) CreateUser(userInput *customTypes.UserInput) (*models.User,
 
 		address := mapAddressInput(userInput.Address, user.ID)
 
-		// create address
 		if err := tx.Create(&address).Error; err != nil {
 			fmt.Printf("Error creating address: %v", err)
 			return err
@@ -130,7 +129,7 @@ func (u UserService) CreateUser(userInput *customTypes.UserInput) (*models.User,
 			value.UserID = user.ID
 		}
 
-		// user.Address is a slice of pointers to models.Address
+		// add address values to user model (for returning)
 		user.Address = address
 
 		for _, role := range userInput.Role {
@@ -146,13 +145,12 @@ func (u UserService) CreateUser(userInput *customTypes.UserInput) (*models.User,
 			})
 		}
 
-		// create UserRoles
 		if err := tx.Create(&userRoles).Error; err != nil {
 			fmt.Printf("Error creating user roles: %v", err)
 			return err
 		}
 
-		// add role values to user model
+		// add role values to user model (for returning)
 		for _, role := range userInput.Role {
 			role, err := u.GetRoleByName(role.Name)
 
