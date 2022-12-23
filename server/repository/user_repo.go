@@ -79,7 +79,6 @@ func (u UserService) CreateUser(userInput *customTypes.UserInput) (*models.User,
 		LastName:  userInput.LastName,
 		Email:     userInput.Email,
 		Password:  userInput.Password,
-		//Address:   mapAddressInputUser(userInput.Address),
 	}
 
 	err := u.Db.Transaction(func(tx *gorm.DB) error {
@@ -115,22 +114,13 @@ func (u UserService) CreateUser(userInput *customTypes.UserInput) (*models.User,
 				UserID: user.ID,
 				RoleID: role.ID,
 			})
+
+			user.Roles = append(user.Roles, role)
 		}
 
 		if err := tx.Create(&userRoles).Error; err != nil {
 			fmt.Printf("Error creating user roles: %v", err)
 			return err
-		}
-
-		// add role values to user model (for returning)
-		for _, role := range userInput.Role {
-			role, err := u.GetRoleByName(role.Name)
-
-			if err != nil {
-				return err
-			}
-
-			user.Roles = append(user.Roles, role)
 		}
 
 		return nil
