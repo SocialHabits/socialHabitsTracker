@@ -71,34 +71,6 @@ func mapAddressInput(addressInput []*customTypes.AddressInput, id uint) []*model
 	return addresses
 }
 
-//// mapRolesInput maps customTypes.RoleInput to models.Role
-//func mapRolesInput(rolesInput []*customTypes.RoleInput) []*models.Role {
-//	var roles []*models.Role
-//
-//	for _, role := range rolesInput {
-//		roles = append(roles, &models.Role{
-//			Name: role.Name,
-//		})
-//	}
-//
-//	return roles
-//}
-
-func mapAddressInputUser(addressInput []*customTypes.AddressInput) []*models.Address {
-	var addresses []*models.Address
-
-	for _, address := range addressInput {
-		addresses = append(addresses, &models.Address{
-			Street:  address.Street,
-			City:    address.City,
-			Country: address.Country,
-			//UserID:  ,
-		})
-	}
-
-	return addresses
-}
-
 func (u UserService) CreateUser(userInput *customTypes.UserInput) (*models.User, error) {
 	var userRoles []*models.UserRoles
 
