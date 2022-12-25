@@ -7,17 +7,27 @@ package graph
 import (
 	"context"
 	"fmt"
+	"github.com/99designs/gqlgen/graphql"
 	generated "github.com/AntonioTrupac/socialHabitsTracker/graph"
 	"github.com/AntonioTrupac/socialHabitsTracker/graph/customTypes"
 	"github.com/AntonioTrupac/socialHabitsTracker/util"
+	"github.com/vektah/gqlparser/v2/gqlerror"
 )
 
 // CreateUser is the resolver for the createUser field.
 func (r *mutationResolver) CreateUser(ctx context.Context, input customTypes.UserInput) (*customTypes.User, error) {
-	// get role
-
 	// check email
 	util.CheckEmail(input.Email)
+
+	// check if user email already exists
+	userExists, err := r.UserRepository.CheckUserEmail(input.Email)
+
+	if userExists {
+		graphql.AddError(ctx, &gqlerror.Error{
+			Message: "User with this email already exists",
+		})
+		return nil, err
+	}
 
 	user, err := r.UserRepository.CreateUser(&input)
 

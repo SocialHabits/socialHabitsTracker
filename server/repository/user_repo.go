@@ -17,6 +17,7 @@ type UserRepository interface {
 	GetRoles() ([]*models.Role, error)
 	GetRoleByName(name string) (*models.Role, error)
 	CreateRole(roleInput *customTypes.RoleInput) (*models.Role, error)
+	CheckUserEmail(email string) (bool, error)
 	// UpdateUser(userInput *customTypes.UserInput, id int) error
 }
 
@@ -71,6 +72,24 @@ func mapAddressInput(addressInput []*customTypes.AddressInput, id uint) []*model
 	return addresses
 }
 
+// CheckUserEmail check if user email already exists
+func (u UserService) CheckUserEmail(email string) (bool, error) {
+	var user models.User
+
+	err := u.Db.Model(&models.User{}).Where("email = ?", email).First(&user).Error
+
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return false, err
+	}
+
+	return true, nil
+}
+
+type Result struct {
+	ID   uint
+	Name string
+}
+
 func (u UserService) CreateUser(userInput *customTypes.UserInput) (*models.User, error) {
 	var userRoles []*models.UserRoles
 
@@ -96,7 +115,6 @@ func (u UserService) CreateUser(userInput *customTypes.UserInput) (*models.User,
 		}
 
 		for _, value := range address {
-			fmt.Println(value.ID)
 			value.UserID = user.ID
 		}
 
@@ -148,7 +166,7 @@ func (u UserService) GetRoles() ([]*models.Role, error) {
 func (u UserService) GetRoleByName(name string) (*models.Role, error) {
 	var role models.Role
 
-	err := u.Db.Model(&models.Role{}).Select("name, id").Where("name = ?", name).Find(&role).Error
+	err := u.Db.Model(&models.Role{}).Select("name, id").Where("name = ?", name).Find(&role).Limit(1).Error
 
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		fmt.Printf("Role with name %s not found", name)
