@@ -20,3 +20,16 @@ func MapAddressModelToGqlType(addressesModel []*models.Address) []*customTypes.A
 
 	return addresses
 }
+
+func MapRoleModelToGqlType(roleModel []*models.Role) []*customTypes.Role {
+	var roles []*customTypes.Role
+
+	for _, r := range roleModel {
+		roles = append(roles, &customTypes.Role{
+			ID:   int(r.ID),
+			Name: r.Name,
+		})
+	}
+
+	return roles
+}
