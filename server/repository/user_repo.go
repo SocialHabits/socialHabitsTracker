@@ -19,6 +19,7 @@ type UserRepository interface {
 	GetRoleByName(name string) (*models.Role, error)
 	CreateRole(roleInput *customTypes.RoleInput) (*models.Role, error)
 	Login(email, password string) (interface{}, error)
+	CheckUserEmail(email string) (bool, error)
 	// UpdateUser(userInput *customTypes.UserInput, id int) error
 }
 
@@ -73,6 +74,24 @@ func mapAddressInput(addressInput []*customTypes.AddressInput, id uint) []*model
 	return addresses
 }
 
+// CheckUserEmail check if user email already exists
+func (u UserService) CheckUserEmail(email string) (bool, error) {
+	var user models.User
+
+	err := u.Db.Model(&models.User{}).Where("email = ?", email).First(&user).Error
+
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return false, err
+	}
+
+	return true, nil
+}
+
+type Result struct {
+	ID   uint
+	Name string
+}
+
 func (u UserService) CreateUser(userInput *customTypes.UserInput) (*models.User, error) {
 	var userRoles []*models.UserRoles
 
@@ -98,7 +117,6 @@ func (u UserService) CreateUser(userInput *customTypes.UserInput) (*models.User,
 		}
 
 		for _, value := range address {
-			fmt.Println(value.ID)
 			value.UserID = user.ID
 		}
 
