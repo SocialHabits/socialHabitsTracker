@@ -6,10 +6,10 @@ import (
 	resolvers "github.com/AntonioTrupac/socialHabitsTracker/graph/resolvers"
 	"github.com/AntonioTrupac/socialHabitsTracker/models"
 	"github.com/AntonioTrupac/socialHabitsTracker/repository"
+	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+	"gorm.io/gorm"
 
-	"log"
-	"net/http"
 	"os"
 
 	"github.com/99designs/gqlgen/graphql/handler"
@@ -17,6 +17,28 @@ import (
 )
 
 const defaultPort = "8080"
+
+func graphqlHandler(db *gorm.DB) gin.HandlerFunc {
+	bookRepo := repository.NewBookService(db)
+	userRepo := repository.NewUserService(db)
+
+	h := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &resolvers.Resolver{
+		BookRepository: bookRepo,
+		UserRepository: userRepo,
+	}}))
+
+	return func(c *gin.Context) {
+		h.ServeHTTP(c.Writer, c.Request)
+	}
+}
+
+func playgroundHandler() gin.HandlerFunc {
+	h := playground.Handler("GraphQL playground", "/query")
+
+	return func(c *gin.Context) {
+		h.ServeHTTP(c.Writer, c.Request)
+	}
+}
 
 func main() {
 	err := godotenv.Load(".env")
@@ -33,18 +55,9 @@ func main() {
 	if port == "" {
 		port = defaultPort
 	}
+	r := gin.Default()
 
-	bookRepo := repository.NewBookService(db)
-	userRepo := repository.NewUserService(db)
-
-	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &resolvers.Resolver{
-		BookRepository: bookRepo,
-		UserRepository: userRepo,
-	}}))
-
-	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
-	http.Handle("/query", srv)
-
-	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
-	log.Fatal(http.ListenAndServe(":"+port, nil))
+	r.POST("/query", graphqlHandler(db))
+	r.GET("/", playgroundHandler())
+	r.Run(":" + port)
 }

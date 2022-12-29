@@ -148,7 +148,7 @@ func (u UserService) GetRoles() ([]*models.Role, error) {
 func (u UserService) GetRoleByName(name string) (*models.Role, error) {
 	var role models.Role
 
-	err := u.Db.Model(&models.Role{}).Select("name, id").Where("name = ?", name).Find(&role).Error
+	err := u.Db.Model(&models.Role{}).Select("id, name").Where("name = ?", name).Find(&role).Error
 
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		fmt.Printf("Role with name %s not found", name)
