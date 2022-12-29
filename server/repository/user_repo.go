@@ -6,6 +6,7 @@ import (
 	"github.com/AntonioTrupac/socialHabitsTracker/graph/customTypes"
 	"github.com/AntonioTrupac/socialHabitsTracker/models"
 	"github.com/AntonioTrupac/socialHabitsTracker/util"
+	"github.com/vektah/gqlparser/v2/gqlerror"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
@@ -17,6 +18,7 @@ type UserRepository interface {
 	GetRoles() ([]*models.Role, error)
 	GetRoleByName(name string) (*models.Role, error)
 	CreateRole(roleInput *customTypes.RoleInput) (*models.Role, error)
+	Login(email, password string) (interface{}, error)
 	// UpdateUser(userInput *customTypes.UserInput, id int) error
 }
 
@@ -169,4 +171,37 @@ func (u UserService) CreateRole(roleInput *customTypes.RoleInput) (*models.Role,
 	}
 
 	return role, nil
+}
+
+func (u UserService) Login(email, password string) (interface{}, error) {
+	var user *models.User
+
+	if err := u.Db.Model(&user).Where("email LIKE ?", email).Take(&user).Error; err != nil {
+		// if user not found
+		if err == gorm.ErrRecordNotFound {
+			return nil, &gqlerror.Error{
+				Message: "User with this email not found",
+			}
+		}
+
+		return nil, err
+
+	}
+
+	fmt.Printf("User: %v", user)
+
+	if err := util.ComparePassword(password, user.Password); err != nil {
+		return nil, &gqlerror.Error{
+			Message: "Incorrect password",
+		}
+	}
+
+	accessToken, err := util.GenerateAccessToken(int(user.ID), user.Email)
+	if err != nil {
+		return nil, err
+	}
+
+	return map[string]interface{}{
+		"accessToken": accessToken,
+	}, nil
 }

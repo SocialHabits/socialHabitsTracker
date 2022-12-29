@@ -7,6 +7,7 @@ package graph
 import (
 	"context"
 	"fmt"
+
 	generated "github.com/AntonioTrupac/socialHabitsTracker/graph"
 	"github.com/AntonioTrupac/socialHabitsTracker/graph/customTypes"
 	"github.com/AntonioTrupac/socialHabitsTracker/util"
@@ -62,6 +63,11 @@ func (r *mutationResolver) CreateRole(ctx context.Context, input customTypes.Rol
 	}
 
 	return createdRole, nil
+}
+
+// Login is the resolver for the login field.
+func (r *mutationResolver) Login(ctx context.Context, email string, password string) (interface{}, error) {
+	return r.UserRepository.Login(email, password)
 }
 
 // GetUser is the resolver for the getUser field.

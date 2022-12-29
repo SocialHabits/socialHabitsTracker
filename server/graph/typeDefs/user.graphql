@@ -52,4 +52,5 @@ extend type Mutation {
     updateUser(id: ID!, input: UserInput!): User!
     deleteUser(id: ID!): User!
     createRole(input: RoleInput!): Role!
+    login(email: String!, password: String!): Any!
 }
