@@ -17,7 +17,7 @@ type CookieAccess struct {
 	IsLoggedIn bool
 }
 
-// method to write cookie
+// SetToken method to write cookie
 func (access *CookieAccess) SetToken(token string) {
 	http.SetCookie(access.Writer, &http.Cookie{
 		Name:     "jwt",
@@ -44,6 +44,12 @@ func extractUserId(ctx *gin.Context) (int, error) {
 func setValInCtx(ctx *gin.Context, val interface{}) {
 	newCtx := context.WithValue(ctx.Request.Context(), cookieAccessKeyCtx, val)
 	ctx.Request = ctx.Request.WithContext(newCtx)
+}
+
+func GetValFromCtx(ctx context.Context) *CookieAccess {
+	raw := ctx.Value(cookieAccessKeyCtx).(*CookieAccess)
+
+	return raw
 }
 
 func AuthMiddleware() gin.HandlerFunc {

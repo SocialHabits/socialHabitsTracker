@@ -10,6 +10,7 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 	generated "github.com/AntonioTrupac/socialHabitsTracker/graph"
 	"github.com/AntonioTrupac/socialHabitsTracker/graph/customTypes"
+	"github.com/AntonioTrupac/socialHabitsTracker/middleware"
 	"github.com/AntonioTrupac/socialHabitsTracker/util"
 	"github.com/vektah/gqlparser/v2/gqlerror"
 )
@@ -76,7 +77,6 @@ func (r *mutationResolver) CreateRole(ctx context.Context, input customTypes.Rol
 
 // Login is the resolver for the login field.
 func (r *mutationResolver) Login(ctx context.Context, email string, password string) (interface{}, error) {
-
 	return r.UserRepository.Login(ctx, email, password)
 }
 
@@ -102,6 +102,16 @@ func (r *queryResolver) GetUser(ctx context.Context, id int) (*customTypes.User,
 
 // GetUsers is the resolver for the getUsers field.
 func (r *queryResolver) GetUsers(ctx context.Context) ([]*customTypes.User, error) {
+	userClaims := middleware.GetValFromCtx(ctx)
+
+	fmt.Println(userClaims.UserId)
+
+	if userClaims == nil || userClaims.UserId <= 0 && userClaims.IsLoggedIn == false {
+		return nil, &gqlerror.Error{
+			Message: "User is not authorized or logged in",
+		}
+	}
+
 	var usersGql []*customTypes.User
 	usersRepo, err := r.UserRepository.GetUsers()
 
