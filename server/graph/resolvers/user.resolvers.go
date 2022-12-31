@@ -7,7 +7,6 @@ package graph
 import (
 	"context"
 	"fmt"
-
 	"github.com/99designs/gqlgen/graphql"
 	generated "github.com/AntonioTrupac/socialHabitsTracker/graph"
 	"github.com/AntonioTrupac/socialHabitsTracker/graph/customTypes"
@@ -77,7 +76,8 @@ func (r *mutationResolver) CreateRole(ctx context.Context, input customTypes.Rol
 
 // Login is the resolver for the login field.
 func (r *mutationResolver) Login(ctx context.Context, email string, password string) (interface{}, error) {
-	return r.UserRepository.Login(email, password)
+
+	return r.UserRepository.Login(ctx, email, password)
 }
 
 // GetUser is the resolver for the getUser field.

@@ -4,6 +4,7 @@ import (
 	"github.com/AntonioTrupac/socialHabitsTracker/database"
 	generated "github.com/AntonioTrupac/socialHabitsTracker/graph"
 	resolvers "github.com/AntonioTrupac/socialHabitsTracker/graph/resolvers"
+	"github.com/AntonioTrupac/socialHabitsTracker/middleware"
 	"github.com/AntonioTrupac/socialHabitsTracker/models"
 	"github.com/AntonioTrupac/socialHabitsTracker/repository"
 	"github.com/gin-gonic/gin"
@@ -57,6 +58,7 @@ func main() {
 	}
 	r := gin.Default()
 
+	r.Use(middleware.AuthMiddleware())
 	r.POST("/query", graphqlHandler(db))
 	r.GET("/", playgroundHandler())
 	r.Run(":" + port)
