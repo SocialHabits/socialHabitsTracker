@@ -1,7 +1,6 @@
 package util
 
 import (
-	"context"
 	"fmt"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/google/uuid"
@@ -10,9 +9,10 @@ import (
 )
 
 type Claims struct {
-	UserID  int    `json:"userId"`
-	TokenID string `json:"tokenId"`
-	Email   string `json:"email"`
+	UserID   int    `json:"userId"`
+	TokenID  string `json:"tokenId"`
+	Email    string `json:"email"`
+	RoleName string `json:"roleName"`
 	jwt.RegisteredClaims
 }
 
@@ -39,13 +39,14 @@ func getRefreshTokenSecret() string {
 	return secret
 }
 
-func GenerateAccessToken(userId int, email string) (string, error) {
+func GenerateAccessToken(userId int, email string, role string) (string, error) {
 	tokenId := uuid.New().String()
 
 	tokenClaims := jwt.NewWithClaims(jwt.SigningMethodHS256, &Claims{
-		UserID:  userId,
-		TokenID: tokenId,
-		Email:   email,
+		UserID:   userId,
+		TokenID:  tokenId,
+		Email:    email,
+		RoleName: role,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Minute * 15)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
@@ -59,24 +60,6 @@ func GenerateAccessToken(userId int, email string) (string, error) {
 	}
 
 	return token, nil
-}
-
-// ValidateJwt validates the token and returns it
-func ValidateJwt(ctx context.Context, token string) (*jwt.Token, error) {
-	if token == "" {
-		return nil, fmt.Errorf("auth token string empty")
-	}
-
-	// validate and return the token as *jwt.Token
-	// first check the token method
-	// check if the signing method is HMAC since secret HS256 to sign the token is used
-	return jwt.ParseWithClaims(token, &Claims{}, func(t *jwt.Token) (interface{}, error) {
-		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("there has been a problem with the signing method")
-		}
-
-		return accessTokenSecret, nil
-	})
 }
 
 func ValidateIdToken(tokenString string) (*Claims, error) {

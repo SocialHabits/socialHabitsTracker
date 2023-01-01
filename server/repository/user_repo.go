@@ -52,7 +52,7 @@ func (u UserService) GetUserById(id int) (*models.User, error) {
 func (u UserService) GetUsers() ([]*models.User, error) {
 	var users []*models.User
 
-	err := u.Db.Model(&models.User{}).Preload("Address").Find(&users).Error
+	err := u.Db.Model(&models.User{}).Preload("Address").Preload("Roles").Find(&users).Error
 
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		fmt.Printf("No users found")
@@ -196,7 +196,7 @@ func (u UserService) CreateRole(roleInput *customTypes.RoleInput) (*models.Role,
 func (u UserService) Login(ctx context.Context, email, password string) (interface{}, error) {
 	var user *models.User
 
-	if err := u.Db.Model(&user).Where("email LIKE ?", email).Take(&user).Error; err != nil {
+	if err := u.Db.Model(&user).Preload("Address").Preload("Roles").Where("email LIKE ?", email).Take(&user).Error; err != nil {
 		// if user not found
 		if err == gorm.ErrRecordNotFound {
 			return nil, &gqlerror.Error{
@@ -214,7 +214,7 @@ func (u UserService) Login(ctx context.Context, email, password string) (interfa
 		}
 	}
 
-	accessToken, err := util.GenerateAccessToken(int(user.ID), user.Email)
+	accessToken, err := util.GenerateAccessToken(int(user.ID), user.Email, user.Roles[0].Name)
 	if err != nil {
 		return nil, err
 	}
@@ -222,6 +222,7 @@ func (u UserService) Login(ctx context.Context, email, password string) (interfa
 	CA := middleware.GetCookieAccess(ctx)
 	CA.SetToken(accessToken)
 	CA.UserId = uint64(user.ID)
+	CA.RoleName = user.Roles[0].Name
 
 	return map[string]interface{}{
 		"accessToken": accessToken,

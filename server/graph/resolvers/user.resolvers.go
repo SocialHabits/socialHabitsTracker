@@ -61,6 +61,14 @@ func (r *mutationResolver) DeleteUser(ctx context.Context, id int) (*customTypes
 
 // CreateRole is the resolver for the createRole field.
 func (r *mutationResolver) CreateRole(ctx context.Context, input customTypes.RoleInput) (*customTypes.Role, error) {
+	userClaims := middleware.GetValFromCtx(ctx)
+
+	if userClaims == nil || userClaims.UserId <= 0 && userClaims.IsLoggedIn == false && userClaims.RoleName != "regular" {
+		return nil, &gqlerror.Error{
+			Message: "User is not authorized or logged in",
+		}
+	}
+
 	role, err := r.UserRepository.CreateRole(&input)
 
 	createdRole := &customTypes.Role{
@@ -82,6 +90,14 @@ func (r *mutationResolver) Login(ctx context.Context, email string, password str
 
 // GetUser is the resolver for the getUser field.
 func (r *queryResolver) GetUser(ctx context.Context, id int) (*customTypes.User, error) {
+	userClaims := middleware.GetValFromCtx(ctx)
+
+	if userClaims == nil || userClaims.UserId <= 0 && userClaims.IsLoggedIn == false {
+		return nil, &gqlerror.Error{
+			Message: "User is not authorized or logged in",
+		}
+	}
+
 	user, err := r.UserRepository.GetUserById(id)
 
 	userGql := &customTypes.User{
@@ -104,9 +120,7 @@ func (r *queryResolver) GetUser(ctx context.Context, id int) (*customTypes.User,
 func (r *queryResolver) GetUsers(ctx context.Context) ([]*customTypes.User, error) {
 	userClaims := middleware.GetValFromCtx(ctx)
 
-	fmt.Println(userClaims.UserId)
-
-	if userClaims == nil || userClaims.UserId <= 0 && userClaims.IsLoggedIn == false {
+	if userClaims == nil || userClaims.UserId <= 0 && userClaims.IsLoggedIn == false || userClaims.RoleName != "regular" {
 		return nil, &gqlerror.Error{
 			Message: "User is not authorized or logged in",
 		}
@@ -120,7 +134,7 @@ func (r *queryResolver) GetUsers(ctx context.Context) ([]*customTypes.User, erro
 			FirstName: u.FirstName,
 			LastName:  u.LastName,
 			Email:     u.Email,
-			Role:      nil,
+			Role:      generated.MapRoleModelToGqlType(u.Roles),
 			ID:        int(u.ID),
 			Address:   generated.MapAddressModelToGqlType(u.Address),
 		})
@@ -135,6 +149,14 @@ func (r *queryResolver) GetUsers(ctx context.Context) ([]*customTypes.User, erro
 
 // GetRoles is the resolver for the getRoles field.
 func (r *queryResolver) GetRoles(ctx context.Context) ([]*customTypes.Role, error) {
+	userClaims := middleware.GetValFromCtx(ctx)
+
+	if userClaims == nil || userClaims.UserId <= 0 && userClaims.IsLoggedIn == false {
+		return nil, &gqlerror.Error{
+			Message: "User is not authorized or logged in",
+		}
+	}
+
 	roles, err := r.UserRepository.GetRoles()
 
 	var rolesGql []*customTypes.Role
@@ -155,6 +177,14 @@ func (r *queryResolver) GetRoles(ctx context.Context) ([]*customTypes.Role, erro
 
 // GetRole is the resolver for the getRole field.
 func (r *queryResolver) GetRole(ctx context.Context, name string) (*customTypes.Role, error) {
+	userClaims := middleware.GetValFromCtx(ctx)
+
+	if userClaims == nil || userClaims.UserId <= 0 && userClaims.IsLoggedIn == false {
+		return nil, &gqlerror.Error{
+			Message: "User is not authorized or logged in",
+		}
+	}
+
 	role, err := r.UserRepository.GetRoleByName(name)
 
 	roleGql := &customTypes.Role{
