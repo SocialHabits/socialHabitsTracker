@@ -2,6 +2,7 @@ package util
 
 import (
 	"fmt"
+	"github.com/AntonioTrupac/socialHabitsTracker/models"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/google/uuid"
 	"os"
@@ -9,10 +10,10 @@ import (
 )
 
 type Claims struct {
-	UserID   int    `json:"userId"`
-	TokenID  string `json:"tokenId"`
-	Email    string `json:"email"`
-	RoleName string `json:"roleName"`
+	UserID   int             `json:"userId"`
+	TokenID  string          `json:"tokenId"`
+	Email    string          `json:"email"`
+	RoleName models.UserRole `json:"roleName"`
 	jwt.RegisteredClaims
 }
 
@@ -39,7 +40,7 @@ func getRefreshTokenSecret() string {
 	return secret
 }
 
-func GenerateAccessToken(userId int, email string, role string) (string, error) {
+func GenerateAccessToken(userId int, email string, role models.UserRole) (string, error) {
 	tokenId := uuid.New().String()
 
 	tokenClaims := jwt.NewWithClaims(jwt.SigningMethodHS256, &Claims{

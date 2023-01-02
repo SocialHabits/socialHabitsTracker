@@ -5,7 +5,14 @@ type User {
     email: String!
     password: String!
     address: [Address!]!
-    role: [Role]
+    role: Role
+}
+
+enum Role {
+    ADMIN
+    REGULAR
+    PREMIUM
+    TRAINER
 }
 
 type Address {
@@ -16,18 +23,13 @@ type Address {
     userId: ID!
 }
 
-type Role {
-    id: ID!
-    name: String!
-}
-
 input UserInput {
     firstName: String!
     lastName: String!
     email: String!
     password: String!
     address: [AddressInput!]!
-    role: [RoleInput]
+    role: Role
 }
 
 input AddressInput {
@@ -37,20 +39,19 @@ input AddressInput {
 }
 
 input RoleInput {
-    name: String!
+    name: Role!
 }
 
 extend type Query {
     getUser(id: ID!): User!
     getUsers: [User!]!
     getRoles: [Role!]!
-    getRole(name: String!): Role!
+    getRole(name: Role!): Role!
 }
 
 extend type Mutation {
     createUser(input: UserInput!): User!
     updateUser(id: ID!, input: UserInput!): User!
     deleteUser(id: ID!): User!
-    createRole(input: RoleInput!): Role!
     login(email: String!, password: String!): Any!
 }

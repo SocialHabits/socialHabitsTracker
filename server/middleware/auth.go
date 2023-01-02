@@ -3,6 +3,7 @@ package middleware
 import (
 	"context"
 	"errors"
+	"github.com/AntonioTrupac/socialHabitsTracker/models"
 	"github.com/AntonioTrupac/socialHabitsTracker/util"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -14,7 +15,7 @@ const cookieAccessKeyCtx = "cookieAccess"
 type CookieAccess struct {
 	Writer     http.ResponseWriter
 	UserId     uint64
-	RoleName   string
+	RoleName   models.UserRole
 	IsLoggedIn bool
 }
 
@@ -31,7 +32,7 @@ func (access *CookieAccess) SetToken(token string) {
 
 type CookieContent struct {
 	UserId   int
-	RoleName string
+	RoleName models.UserRole
 }
 
 func extractUserIdAndRoleName(ctx *gin.Context) (*CookieContent, error) {

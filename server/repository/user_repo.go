@@ -17,9 +17,8 @@ type UserRepository interface {
 	GetUserById(id int) (*models.User, error)
 	GetUsers() ([]*models.User, error)
 	CreateUser(userInput *customTypes.UserInput) (*models.User, error)
-	GetRoles() ([]*models.Role, error)
-	GetRoleByName(name string) (*models.Role, error)
-	CreateRole(roleInput *customTypes.RoleInput) (*models.Role, error)
+	GetRoles() ([]*models.User, error)
+	GetRoleByName(name string) (*models.User, error)
 	Login(ctx context.Context, email, password string) (interface{}, error)
 	CheckUserEmail(email string) (bool, error)
 	// UpdateUser(userInput *customTypes.UserInput, id int) error
@@ -94,14 +93,19 @@ type Result struct {
 	Name string
 }
 
+func mapUserInputRoleToUserRole(role *customTypes.Role) models.UserRole {
+	return models.UserRole(role.String())
+}
+
 func (u UserService) CreateUser(userInput *customTypes.UserInput) (*models.User, error) {
-	var userRoles []*models.UserRoles
+	//var userRoles []*models.UserRoles
 
 	user := &models.User{
 		FirstName: userInput.FirstName,
 		LastName:  userInput.LastName,
 		Email:     userInput.Email,
 		Password:  userInput.Password,
+		Role:      mapUserInputRoleToUserRole(userInput.Role),
 	}
 
 	err := u.Db.Transaction(func(tx *gorm.DB) error {
@@ -122,28 +126,7 @@ func (u UserService) CreateUser(userInput *customTypes.UserInput) (*models.User,
 			value.UserID = user.ID
 		}
 
-		// add address values to user model (for returning)
 		user.Address = address
-
-		for _, role := range userInput.Role {
-			role, err := u.GetRoleByName(role.Name)
-
-			if err != nil {
-				return err
-			}
-
-			userRoles = append(userRoles, &models.UserRoles{
-				UserID: user.ID,
-				RoleID: role.ID,
-			})
-
-			user.Roles = append(user.Roles, role)
-		}
-
-		if err := tx.Create(&userRoles).Error; err != nil {
-			fmt.Printf("Error creating user roles: %v", err)
-			return err
-		}
 
 		return nil
 	})
@@ -155,10 +138,10 @@ func (u UserService) CreateUser(userInput *customTypes.UserInput) (*models.User,
 	return user, nil
 }
 
-func (u UserService) GetRoles() ([]*models.Role, error) {
-	var roles []*models.Role
+func (u UserService) GetRoles() ([]*models.User, error) {
+	var roles []*models.User
 
-	err := u.Db.Model(&models.Role{}).Find(&roles).Error
+	err := u.Db.Model(&models.User{}).Find(&roles).Error
 
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		fmt.Printf("No roles found")
@@ -167,30 +150,16 @@ func (u UserService) GetRoles() ([]*models.Role, error) {
 	return roles, err
 }
 
-func (u UserService) GetRoleByName(name string) (*models.Role, error) {
-	var role models.Role
+func (u UserService) GetRoleByName(name string) (*models.User, error) {
+	var role models.User
 
-	err := u.Db.Model(&models.Role{}).Select("id, name").Where("name = ?", name).Find(&role).Error
+	err := u.Db.Model(&models.User{}).Select("id, name").Where("name = ?", name).Find(&role).Error
 
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		fmt.Printf("Role with name %s not found", name)
 	}
 
 	return &role, err
-}
-
-func (u UserService) CreateRole(roleInput *customTypes.RoleInput) (*models.Role, error) {
-	role := &models.Role{
-		Name: roleInput.Name,
-	}
-
-	err := u.Db.Create(role).Error
-
-	if err != nil {
-		return nil, err
-	}
-
-	return role, nil
 }
 
 func (u UserService) Login(ctx context.Context, email, password string) (interface{}, error) {
@@ -214,7 +183,7 @@ func (u UserService) Login(ctx context.Context, email, password string) (interfa
 		}
 	}
 
-	accessToken, err := util.GenerateAccessToken(int(user.ID), user.Email, user.Roles[0].Name)
+	accessToken, err := util.GenerateAccessToken(int(user.ID), user.Email, user.Role)
 	if err != nil {
 		return nil, err
 	}
@@ -222,7 +191,7 @@ func (u UserService) Login(ctx context.Context, email, password string) (interfa
 	CA := middleware.GetCookieAccess(ctx)
 	CA.SetToken(accessToken)
 	CA.UserId = uint64(user.ID)
-	CA.RoleName = user.Roles[0].Name
+	CA.RoleName = user.Role
 
 	return map[string]interface{}{
 		"accessToken": accessToken,

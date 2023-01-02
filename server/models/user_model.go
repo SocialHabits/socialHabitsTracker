@@ -1,19 +1,45 @@
 package models
 
 import (
+	"database/sql/driver"
 	"gorm.io/gorm"
 	"time"
 )
+
+type UserRole string
+
+const (
+	Admin   UserRole = "ADMIN"
+	Regular UserRole = "REGULAR"
+	Premium UserRole = "PREMIUM"
+	Trainer UserRole = "TRAINER"
+)
+
+func (u *UserRole) Scan(value interface{}) error {
+	b, ok := value.([]byte)
+	if !ok {
+		*u = UserRole(b)
+	}
+	return nil
+}
+
+func (u UserRole) Value() (driver.Value, error) {
+	return string(u), nil
+}
 
 type User struct {
 	ID        uint   `gorm:"primarykey"`
 	FirstName string `gorm:"size:255;not null" json:"first_name"`
 	LastName  string `gorm:"size:255;not null" json:"last_name"`
-	Email     string `gorm:"unique;size:255;not null" json:"email"`
+	Email     string `gorm:"size:255;not null" json:"email"`
 	Password  string `gorm:"size:255;not null" json:"password"`
 	Address   []*Address
-	Roles     []*Role `gorm:"many2many:user_roles;"`
+	Role      UserRole `gorm:"type:enum('ADMIN', 'REGULAR', 'PREMIUM', 'TRAINER')";"column:role" json:"role"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	DeletedAt gorm.DeletedAt `gorm:"index"`
+}
+
+func (User) TableName() string {
+	return "users"
 }

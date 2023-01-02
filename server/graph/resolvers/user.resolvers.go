@@ -7,6 +7,7 @@ package graph
 import (
 	"context"
 	"fmt"
+
 	"github.com/99designs/gqlgen/graphql"
 	generated "github.com/AntonioTrupac/socialHabitsTracker/graph"
 	"github.com/AntonioTrupac/socialHabitsTracker/graph/customTypes"
@@ -38,7 +39,7 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input customTypes.Use
 		Email:     user.Email,
 		Password:  user.Password,
 		Address:   generated.MapAddressModelToGqlType(user.Address),
-		Role:      generated.MapRoleModelToGqlType(user.Roles),
+		Role:      input.Role,
 		ID:        int(user.ID),
 	}
 
@@ -57,30 +58,6 @@ func (r *mutationResolver) UpdateUser(ctx context.Context, id int, input customT
 // DeleteUser is the resolver for the deleteUser field.
 func (r *mutationResolver) DeleteUser(ctx context.Context, id int) (*customTypes.User, error) {
 	panic(fmt.Errorf("not implemented: DeleteUser - deleteUser"))
-}
-
-// CreateRole is the resolver for the createRole field.
-func (r *mutationResolver) CreateRole(ctx context.Context, input customTypes.RoleInput) (*customTypes.Role, error) {
-	userClaims := middleware.GetValFromCtx(ctx)
-
-	if userClaims == nil || userClaims.UserId <= 0 && userClaims.IsLoggedIn == false && userClaims.RoleName != "regular" {
-		return nil, &gqlerror.Error{
-			Message: "User is not authorized or logged in",
-		}
-	}
-
-	role, err := r.UserRepository.CreateRole(&input)
-
-	createdRole := &customTypes.Role{
-		ID:   int(role.ID),
-		Name: role.Name,
-	}
-
-	if err != nil {
-		return nil, err
-	}
-
-	return createdRole, nil
 }
 
 // Login is the resolver for the login field.
@@ -134,9 +111,9 @@ func (r *queryResolver) GetUsers(ctx context.Context) ([]*customTypes.User, erro
 			FirstName: u.FirstName,
 			LastName:  u.LastName,
 			Email:     u.Email,
-			Role:      generated.MapRoleModelToGqlType(u.Roles),
-			ID:        int(u.ID),
-			Address:   generated.MapAddressModelToGqlType(u.Address),
+			//Role:      generated.MapRoleModelToGqlType(u.Roles),
+			ID:      int(u.ID),
+			Address: generated.MapAddressModelToGqlType(u.Address),
 		})
 	}
 
@@ -148,7 +125,7 @@ func (r *queryResolver) GetUsers(ctx context.Context) ([]*customTypes.User, erro
 }
 
 // GetRoles is the resolver for the getRoles field.
-func (r *queryResolver) GetRoles(ctx context.Context) ([]*customTypes.Role, error) {
+func (r *queryResolver) GetRoles(ctx context.Context) ([]customTypes.Role, error) {
 	userClaims := middleware.GetValFromCtx(ctx)
 
 	if userClaims == nil || userClaims.UserId <= 0 && userClaims.IsLoggedIn == false {
@@ -157,44 +134,44 @@ func (r *queryResolver) GetRoles(ctx context.Context) ([]*customTypes.Role, erro
 		}
 	}
 
-	roles, err := r.UserRepository.GetRoles()
+	//roles, err := r.UserRepository.GetRoles()
+	//
+	//var rolesGql []*customTypes.Role
+	//
+	//for _, r := range roles {
+	//	rolesGql = append(rolesGql, &customTypes.Role{
+	//		ID:   int(r.ID),
+	//		Name: r.Name,
+	//	})
+	//}
+	//
+	//if err != nil {
+	//	return nil, err
+	//}
 
-	var rolesGql []*customTypes.Role
-
-	for _, r := range roles {
-		rolesGql = append(rolesGql, &customTypes.Role{
-			ID:   int(r.ID),
-			Name: r.Name,
-		})
-	}
-
-	if err != nil {
-		return nil, err
-	}
-
-	return rolesGql, nil
+	return nil, nil
 }
 
 // GetRole is the resolver for the getRole field.
-func (r *queryResolver) GetRole(ctx context.Context, name string) (*customTypes.Role, error) {
+func (r *queryResolver) GetRole(ctx context.Context, name customTypes.Role) (customTypes.Role, error) {
 	userClaims := middleware.GetValFromCtx(ctx)
 
 	if userClaims == nil || userClaims.UserId <= 0 && userClaims.IsLoggedIn == false {
-		return nil, &gqlerror.Error{
+		return "", &gqlerror.Error{
 			Message: "User is not authorized or logged in",
 		}
 	}
 
-	role, err := r.UserRepository.GetRoleByName(name)
+	//role, err := r.UserRepository.GetRoleByName(name)
 
-	roleGql := &customTypes.Role{
-		ID:   int(role.ID),
-		Name: role.Name,
-	}
+	//roleGql := &customTypes.Role{
+	//	ID:   int(role.ID),
+	//	Name: role.Name,
+	//}
+	//
+	//if err != nil {
+	//	return nil, err
+	//}
 
-	if err != nil {
-		return nil, err
-	}
-
-	return roleGql, nil
+	return "", nil
 }

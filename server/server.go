@@ -50,7 +50,8 @@ func main() {
 		panic(err)
 	}
 
-	db.AutoMigrate(&models.Book{}, &models.User{}, &models.Address{}, &models.Role{}, &models.UserRoles{})
+	db.AutoMigrate(&models.Book{}, &models.User{}, &models.Address{})
+	//db.Migrator().AddColumn(&models.User{}, "role")
 
 	port := os.Getenv("PORT")
 	if port == "" {
