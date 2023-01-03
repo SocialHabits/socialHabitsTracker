@@ -153,7 +153,7 @@ func (r *queryResolver) GetRoles(ctx context.Context) ([]customTypes.Role, error
 }
 
 // GetRole is the resolver for the getRole field.
-func (r *queryResolver) GetRole(ctx context.Context, name customTypes.Role) (customTypes.Role, error) {
+func (r *queryResolver) GetRole(ctx context.Context, id int) (customTypes.Role, error) {
 	userClaims := middleware.GetValFromCtx(ctx)
 
 	if userClaims == nil || userClaims.UserId <= 0 && userClaims.IsLoggedIn == false {
@@ -162,16 +162,27 @@ func (r *queryResolver) GetRole(ctx context.Context, name customTypes.Role) (cus
 		}
 	}
 
-	//role, err := r.UserRepository.GetRoleByName(name)
+	role, err := r.UserRepository.GetRoleByUserID(id)
 
-	//roleGql := &customTypes.Role{
-	//	ID:   int(role.ID),
-	//	Name: role.Name,
-	//}
-	//
-	//if err != nil {
-	//	return nil, err
-	//}
+	if err != nil {
+		return "", err
+	}
 
-	return "", nil
+	var roleGql customTypes.Role
+
+	// convert role name to enum
+	switch role {
+	case "ADMIN":
+		roleGql = customTypes.RoleAdmin
+	case "REGULAR":
+		roleGql = customTypes.RoleRegular
+	case "PREMIUM":
+		roleGql = customTypes.RolePremium
+	case "TRAINER":
+		roleGql = customTypes.RoleTrainer
+	}
+
+	fmt.Println("ROLE", roleGql)
+
+	return roleGql, nil
 }

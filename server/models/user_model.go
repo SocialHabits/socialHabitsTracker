@@ -2,6 +2,7 @@ package models
 
 import (
 	"database/sql/driver"
+	"fmt"
 	"gorm.io/gorm"
 	"time"
 )
@@ -16,11 +17,15 @@ const (
 )
 
 func (u *UserRole) Scan(value interface{}) error {
-	b, ok := value.([]byte)
-	if !ok {
-		*u = UserRole(b)
+	if v, ok := value.([]byte); ok {
+		*u = UserRole(v)
+		return nil
 	}
-	return nil
+	if v, ok := value.(string); ok {
+		*u = UserRole(v)
+		return nil
+	}
+	return fmt.Errorf("unexpected type %T for UserRole", value)
 }
 
 func (u UserRole) Value() (driver.Value, error) {

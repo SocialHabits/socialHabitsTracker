@@ -46,7 +46,7 @@ extend type Query {
     getUser(id: ID!): User!
     getUsers: [User!]!
     getRoles: [Role!]!
-    getRole(name: Role!): Role!
+    getRole(id: Int!): Role!
 }
 
 extend type Mutation {

@@ -76,7 +76,7 @@ type ComplexityRoot struct {
 	Query struct {
 		GetAllBooks func(childComplexity int) int
 		GetOneBook  func(childComplexity int, id int) int
-		GetRole     func(childComplexity int, name customTypes.Role) int
+		GetRole     func(childComplexity int, id int) int
 		GetRoles    func(childComplexity int) int
 		GetTodo     func(childComplexity int, todoID int) int
 		GetTodos    func(childComplexity int) int
@@ -121,7 +121,7 @@ type QueryResolver interface {
 	GetUser(ctx context.Context, id int) (*customTypes.User, error)
 	GetUsers(ctx context.Context) ([]*customTypes.User, error)
 	GetRoles(ctx context.Context) ([]customTypes.Role, error)
-	GetRole(ctx context.Context, name customTypes.Role) (customTypes.Role, error)
+	GetRole(ctx context.Context, id int) (customTypes.Role, error)
 }
 
 type executableSchema struct {
@@ -351,7 +351,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.GetRole(childComplexity, args["name"].(customTypes.Role)), true
+		return e.complexity.Query.GetRole(childComplexity, args["id"].(int)), true
 
 	case "Query.getRoles":
 		if e.complexity.Query.GetRoles == nil {
@@ -773,15 +773,15 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 func (ec *executionContext) field_Query_getRole_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 customTypes.Role
-	if tmp, ok := rawArgs["name"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
-		arg0, err = ec.unmarshalNRole2githubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐRole(ctx, tmp)
+	var arg0 int
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNInt2int(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["name"] = arg0
+	args["id"] = arg0
 	return args, nil
 }
 
@@ -2304,7 +2304,7 @@ func (ec *executionContext) _Query_getRole(ctx context.Context, field graphql.Co
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().GetRole(rctx, fc.Args["name"].(customTypes.Role))
+		return ec.resolvers.Query().GetRole(rctx, fc.Args["id"].(int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)

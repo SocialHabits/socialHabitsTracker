@@ -81,6 +81,7 @@ func AuthMiddleware() gin.HandlerFunc {
 		cookieA.UserId = uint64(user.UserId)
 		cookieA.IsLoggedIn = true
 		cookieA.RoleName = user.RoleName
+		//ctx.Set("user", user)
 
 		// calling the actual resolver
 		ctx.Next()
