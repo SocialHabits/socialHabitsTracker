@@ -162,16 +162,11 @@ func (r *queryResolver) GetRole(ctx context.Context, name customTypes.Role) (cus
 		}
 	}
 
-	//role, err := r.UserRepository.GetRoleByName(name)
+	role, err := r.UserRepository.GetRoleByName(name)
 
-	//roleGql := &customTypes.Role{
-	//	ID:   int(role.ID),
-	//	Name: role.Name,
-	//}
-	//
-	//if err != nil {
-	//	return nil, err
-	//}
+	var roleGql customTypes.Role
 
-	return "", nil
+	roleGql = customTypes.Role(role)
+
+	return , nil
 }

@@ -18,7 +18,7 @@ type UserRepository interface {
 	GetUsers() ([]*models.User, error)
 	CreateUser(userInput *customTypes.UserInput) (*models.User, error)
 	GetRoles() ([]*models.User, error)
-	GetRoleByName(name string) (*models.User, error)
+	GetRoleByName(name customTypes.Role) (*models.User, error)
 	Login(ctx context.Context, email, password string) (interface{}, error)
 	CheckUserEmail(email string) (bool, error)
 	// UpdateUser(userInput *customTypes.UserInput, id int) error
@@ -150,10 +150,10 @@ func (u UserService) GetRoles() ([]*models.User, error) {
 	return roles, err
 }
 
-func (u UserService) GetRoleByName(name string) (*models.User, error) {
+func (u UserService) GetRoleByName(name customTypes.Role) (*models.User, error) {
 	var role models.User
 
-	err := u.Db.Model(&models.User{}).Select("id, name").Where("name = ?", name).Find(&role).Error
+	err := u.Db.Model(&models.User{}).Select("role").Where("role = ?", name).Find(&role).Error
 
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		fmt.Printf("Role with name %s not found", name)
@@ -165,7 +165,7 @@ func (u UserService) GetRoleByName(name string) (*models.User, error) {
 func (u UserService) Login(ctx context.Context, email, password string) (interface{}, error) {
 	var user *models.User
 
-	if err := u.Db.Model(&user).Preload("Address").Preload("Roles").Where("email LIKE ?", email).Take(&user).Error; err != nil {
+	if err := u.Db.Model(&user).Preload("Address").Where("email LIKE ?", email).Take(&user).Error; err != nil {
 		// if user not found
 		if err == gorm.ErrRecordNotFound {
 			return nil, &gqlerror.Error{
