@@ -7,8 +7,10 @@ import (
 	"github.com/AntonioTrupac/socialHabitsTracker/middleware"
 	"github.com/AntonioTrupac/socialHabitsTracker/models"
 	"github.com/AntonioTrupac/socialHabitsTracker/repository"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+
 	"gorm.io/gorm"
 
 	"os"
@@ -58,6 +60,13 @@ func main() {
 		port = defaultPort
 	}
 	r := gin.Default()
+	r.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"http://localhost:3000"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "PATCH"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization", "Set-Cookie"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+	}))
 
 	r.Use(middleware.AuthMiddleware())
 	r.POST("/query", graphqlHandler(db))

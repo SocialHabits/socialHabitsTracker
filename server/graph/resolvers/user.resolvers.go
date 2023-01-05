@@ -96,15 +96,17 @@ func (r *queryResolver) GetUser(ctx context.Context, id int) (*customTypes.User,
 
 // GetUsers is the resolver for the getUsers field.
 func (r *queryResolver) GetUsers(ctx context.Context) ([]*customTypes.User, error) {
-	userClaims := middleware.GetValFromCtx(ctx)
+	// commented out just for testing purposes
 
-	fmt.Println("USER CLAIMS: ", userClaims)
-
-	if userClaims == nil || userClaims.UserId <= 0 && userClaims.IsLoggedIn == false || userClaims.RoleName != "REGULAR" {
-		return nil, &gqlerror.Error{
-			Message: "User is not authorized or logged in",
-		}
-	}
+	//userClaims := middleware.GetValFromCtx(ctx)
+	//
+	//fmt.Println("USER CLAIMS: ", userClaims)
+	//
+	//if userClaims == nil || userClaims.UserId <= 0 && userClaims.IsLoggedIn == false || userClaims.RoleName != "REGULAR" {
+	//	return nil, &gqlerror.Error{
+	//		Message: "User is not authorized or logged in",
+	//	}
+	//}
 
 	var usersGql []*customTypes.User
 	usersRepo, err := r.UserRepository.GetUsers()
