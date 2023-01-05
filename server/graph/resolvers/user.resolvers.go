@@ -69,7 +69,7 @@ func (r *mutationResolver) Login(ctx context.Context, email string, password str
 func (r *queryResolver) GetUser(ctx context.Context, id int) (*customTypes.User, error) {
 	userClaims := middleware.GetValFromCtx(ctx)
 
-	if userClaims == nil || userClaims.UserId <= 0 && userClaims.IsLoggedIn == false {
+	if userClaims == nil || userClaims.UserId <= 0 && userClaims.IsLoggedIn == false && userClaims.RoleName != "REGULAR" {
 		return nil, &gqlerror.Error{
 			Message: "User is not authorized or logged in",
 		}
@@ -81,12 +81,13 @@ func (r *queryResolver) GetUser(ctx context.Context, id int) (*customTypes.User,
 		FirstName: user.FirstName,
 		LastName:  user.LastName,
 		Email:     user.Email,
-		Role:      nil,
+		Role:      generated.ConvertModelRoleToEnum(user.Role),
 		ID:        int(user.ID),
 		Address:   generated.MapAddressModelToGqlType(user.Address),
 	}
 
 	if err != nil {
+		fmt.Println("Could not return user by id")
 		return nil, err
 	}
 

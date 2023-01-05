@@ -59,21 +59,6 @@ func (u UserService) GetUsers() ([]*models.User, error) {
 	return users, err
 }
 
-func mapAddressInput(addressInput []*customTypes.AddressInput, id uint) []*models.Address {
-	var addresses []*models.Address
-
-	for _, address := range addressInput {
-		addresses = append(addresses, &models.Address{
-			Street:  address.Street,
-			City:    address.City,
-			Country: address.Country,
-			UserID:  id,
-		})
-	}
-
-	return addresses
-}
-
 // CheckUserEmail check if user email already exists
 func (u UserService) CheckUserEmail(email string) (bool, error) {
 	var user models.User
@@ -81,6 +66,7 @@ func (u UserService) CheckUserEmail(email string) (bool, error) {
 	err := u.Db.Model(&models.User{}).Where("email = ?", email).First(&user).Error
 
 	if errors.Is(err, gorm.ErrRecordNotFound) {
+		fmt.Errorf("user with email %s not found", email)
 		return false, err
 	}
 
@@ -92,13 +78,7 @@ type Result struct {
 	Name string
 }
 
-func mapUserInputRoleToUserRole(role *customTypes.Role) models.UserRole {
-	return models.UserRole(role.String())
-}
-
 func (u UserService) CreateUser(userInput *customTypes.UserInput) (*models.User, error) {
-	//var userRoles []*models.UserRoles
-
 	user := &models.User{
 		FirstName: userInput.FirstName,
 		LastName:  userInput.LastName,
@@ -131,6 +111,7 @@ func (u UserService) CreateUser(userInput *customTypes.UserInput) (*models.User,
 	})
 
 	if err != nil {
+		fmt.Printf("Error creating user: %v", err)
 		return nil, err
 	}
 
@@ -172,6 +153,7 @@ func (u UserService) Login(ctx context.Context, email, password string) (interfa
 
 	accessToken, err := util.GenerateAccessToken(int(user.ID), user.Email, user.Role)
 	if err != nil {
+		fmt.Printf("Error generating access token: %v", err)
 		return nil, err
 	}
 
@@ -181,6 +163,36 @@ func (u UserService) Login(ctx context.Context, email, password string) (interfa
 	cookieAccess.RoleName = user.Role
 
 	return map[string]interface{}{
-		"accessToken": accessToken,
+		"success": "token has been set",
 	}, nil
+}
+
+func mapUserInputRoleToUserRole(role customTypes.Role) models.UserRole {
+	switch role {
+	case customTypes.RoleAdmin:
+		return models.Admin
+	case customTypes.RoleRegular:
+		return models.Regular
+	case customTypes.RoleTrainer:
+		return models.Trainer
+	case customTypes.RolePremium:
+		return models.Premium
+	default:
+		return models.Regular
+	}
+}
+
+func mapAddressInput(addressInput []*customTypes.AddressInput, id uint) []*models.Address {
+	var addresses []*models.Address
+
+	for _, address := range addressInput {
+		addresses = append(addresses, &models.Address{
+			Street:  address.Street,
+			City:    address.City,
+			Country: address.Country,
+			UserID:  id,
+		})
+	}
+
+	return addresses
 }

@@ -58,7 +58,7 @@ type User struct {
 	Email     string     `json:"email"`
 	Password  string     `json:"password"`
 	Address   []*Address `json:"address"`
-	Role      *Role      `json:"role"`
+	Role      Role       `json:"role"`
 }
 
 type UserInput struct {
@@ -67,7 +67,7 @@ type UserInput struct {
 	Email     string          `json:"email"`
 	Password  string          `json:"password"`
 	Address   []*AddressInput `json:"address"`
-	Role      *Role           `json:"role"`
+	Role      Role            `json:"role"`
 }
 
 type Role string
