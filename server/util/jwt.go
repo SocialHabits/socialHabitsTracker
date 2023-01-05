@@ -18,7 +18,8 @@ type Claims struct {
 }
 
 var accessTokenSecret = []byte(getAccessTokenSecret())
-var refreshTokenSecret = []byte(getRefreshTokenSecret())
+
+//var refreshTokenSecret = []byte(getRefreshTokenSecret())
 
 func getAccessTokenSecret() string {
 	secret := os.Getenv("ACCESS_SECRET")

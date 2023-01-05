@@ -73,11 +73,6 @@ func (u UserService) CheckUserEmail(email string) (bool, error) {
 	return true, nil
 }
 
-type Result struct {
-	ID   uint
-	Name string
-}
-
 func (u UserService) CreateUser(userInput *customTypes.UserInput) (*models.User, error) {
 	user := &models.User{
 		FirstName: userInput.FirstName,
