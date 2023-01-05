@@ -45,7 +45,6 @@ input RoleInput {
 extend type Query {
     getUser(id: ID!): User!
     getUsers: [User!]!
-    getRoles: [Role!]!
     getRole(id: Int!): Role!
 }
 

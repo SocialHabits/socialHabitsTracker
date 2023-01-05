@@ -97,7 +97,9 @@ func (r *queryResolver) GetUser(ctx context.Context, id int) (*customTypes.User,
 func (r *queryResolver) GetUsers(ctx context.Context) ([]*customTypes.User, error) {
 	userClaims := middleware.GetValFromCtx(ctx)
 
-	if userClaims == nil || userClaims.UserId <= 0 && userClaims.IsLoggedIn == false || userClaims.RoleName != "regular" {
+	fmt.Println("USER CLAIMS: ", userClaims)
+
+	if userClaims == nil || userClaims.UserId <= 0 && userClaims.IsLoggedIn == false || userClaims.RoleName != "REGULAR" {
 		return nil, &gqlerror.Error{
 			Message: "User is not authorized or logged in",
 		}
@@ -111,9 +113,9 @@ func (r *queryResolver) GetUsers(ctx context.Context) ([]*customTypes.User, erro
 			FirstName: u.FirstName,
 			LastName:  u.LastName,
 			Email:     u.Email,
-			//Role:      generated.MapRoleModelToGqlType(u.Roles),
-			ID:      int(u.ID),
-			Address: generated.MapAddressModelToGqlType(u.Address),
+			Role:      generated.ConvertModelRoleToEnum(u.Role),
+			ID:        int(u.ID),
+			Address:   generated.MapAddressModelToGqlType(u.Address),
 		})
 	}
 
@@ -122,34 +124,6 @@ func (r *queryResolver) GetUsers(ctx context.Context) ([]*customTypes.User, erro
 	}
 
 	return usersGql, nil
-}
-
-// GetRoles is the resolver for the getRoles field.
-func (r *queryResolver) GetRoles(ctx context.Context) ([]customTypes.Role, error) {
-	userClaims := middleware.GetValFromCtx(ctx)
-
-	if userClaims == nil || userClaims.UserId <= 0 && userClaims.IsLoggedIn == false {
-		return nil, &gqlerror.Error{
-			Message: "User is not authorized or logged in",
-		}
-	}
-
-	//roles, err := r.UserRepository.GetRoles()
-	//
-	//var rolesGql []*customTypes.Role
-	//
-	//for _, r := range roles {
-	//	rolesGql = append(rolesGql, &customTypes.Role{
-	//		ID:   int(r.ID),
-	//		Name: r.Name,
-	//	})
-	//}
-	//
-	//if err != nil {
-	//	return nil, err
-	//}
-
-	return nil, nil
 }
 
 // GetRole is the resolver for the getRole field.
@@ -181,8 +155,6 @@ func (r *queryResolver) GetRole(ctx context.Context, id int) (customTypes.Role, 
 	case "TRAINER":
 		roleGql = customTypes.RoleTrainer
 	}
-
-	fmt.Println("ROLE", roleGql)
 
 	return roleGql, nil
 }

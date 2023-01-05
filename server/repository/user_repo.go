@@ -17,7 +17,6 @@ type UserRepository interface {
 	GetUserById(id int) (*models.User, error)
 	GetUsers() ([]*models.User, error)
 	CreateUser(userInput *customTypes.UserInput) (*models.User, error)
-	GetRoles() ([]*models.User, error)
 	GetRoleByUserID(id int) (models.UserRole, error)
 	Login(ctx context.Context, email, password string) (interface{}, error)
 	CheckUserEmail(email string) (bool, error)
@@ -51,7 +50,7 @@ func (u UserService) GetUserById(id int) (*models.User, error) {
 func (u UserService) GetUsers() ([]*models.User, error) {
 	var users []*models.User
 
-	err := u.Db.Model(&models.User{}).Preload("Address").Preload("Roles").Find(&users).Error
+	err := u.Db.Model(&models.User{}).Preload("Address").Find(&users).Error
 
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		fmt.Printf("No users found")
@@ -138,18 +137,6 @@ func (u UserService) CreateUser(userInput *customTypes.UserInput) (*models.User,
 	return user, nil
 }
 
-func (u UserService) GetRoles() ([]*models.User, error) {
-	var roles []*models.User
-
-	err := u.Db.Model(&models.User{}).Find(&roles).Error
-
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		fmt.Printf("No roles found")
-	}
-
-	return roles, err
-}
-
 func (u UserService) GetRoleByUserID(id int) (models.UserRole, error) {
 	var user *models.User
 
@@ -158,8 +145,6 @@ func (u UserService) GetRoleByUserID(id int) (models.UserRole, error) {
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		fmt.Printf("User and role with id: %d not found", id)
 	}
-
-	fmt.Println("USER ROLE", user.Role, user)
 
 	return user.Role, err
 }
@@ -190,10 +175,10 @@ func (u UserService) Login(ctx context.Context, email, password string) (interfa
 		return nil, err
 	}
 
-	CA := middleware.GetCookieAccess(ctx)
-	CA.SetToken(accessToken)
-	CA.UserId = uint64(user.ID)
-	CA.RoleName = user.Role
+	cookieAccess := middleware.GetCookieAccess(ctx)
+	cookieAccess.SetToken(accessToken)
+	cookieAccess.UserId = uint64(user.ID)
+	cookieAccess.RoleName = user.Role
 
 	return map[string]interface{}{
 		"accessToken": accessToken,

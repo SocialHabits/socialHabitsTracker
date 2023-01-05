@@ -77,7 +77,6 @@ type ComplexityRoot struct {
 		GetAllBooks func(childComplexity int) int
 		GetOneBook  func(childComplexity int, id int) int
 		GetRole     func(childComplexity int, id int) int
-		GetRoles    func(childComplexity int) int
 		GetTodo     func(childComplexity int, todoID int) int
 		GetTodos    func(childComplexity int) int
 		GetUser     func(childComplexity int, id int) int
@@ -120,7 +119,6 @@ type QueryResolver interface {
 	GetOneBook(ctx context.Context, id int) (*customTypes.Book, error)
 	GetUser(ctx context.Context, id int) (*customTypes.User, error)
 	GetUsers(ctx context.Context) ([]*customTypes.User, error)
-	GetRoles(ctx context.Context) ([]customTypes.Role, error)
 	GetRole(ctx context.Context, id int) (customTypes.Role, error)
 }
 
@@ -352,13 +350,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.GetRole(childComplexity, args["id"].(int)), true
-
-	case "Query.getRoles":
-		if e.complexity.Query.GetRoles == nil {
-			break
-		}
-
-		return e.complexity.Query.GetRoles(childComplexity), true
 
 	case "Query.getTodo":
 		if e.complexity.Query.GetTodo == nil {
@@ -2241,50 +2232,6 @@ func (ec *executionContext) fieldContext_Query_getUsers(ctx context.Context, fie
 				return ec.fieldContext_User_role(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Query_getRoles(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_getRoles(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().GetRoles(rctx)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.([]customTypes.Role)
-	fc.Result = res
-	return ec.marshalNRole2ᚕgithubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐRoleᚄ(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Query_getRoles(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Query",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Role does not have child fields")
 		},
 	}
 	return fc, nil
@@ -5314,29 +5261,6 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			out.Concurrently(i, func() graphql.Marshaler {
 				return rrm(innerCtx)
 			})
-		case "getRoles":
-			field := field
-
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Query_getRoles(ctx, field)
-				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
-				}
-				return res
-			}
-
-			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
-			}
-
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
 		case "getRole":
 			field := field
 
@@ -6023,67 +5947,6 @@ func (ec *executionContext) unmarshalNRole2githubᚗcomᚋAntonioTrupacᚋsocial
 
 func (ec *executionContext) marshalNRole2githubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐRole(ctx context.Context, sel ast.SelectionSet, v customTypes.Role) graphql.Marshaler {
 	return v
-}
-
-func (ec *executionContext) unmarshalNRole2ᚕgithubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐRoleᚄ(ctx context.Context, v interface{}) ([]customTypes.Role, error) {
-	var vSlice []interface{}
-	if v != nil {
-		vSlice = graphql.CoerceList(v)
-	}
-	var err error
-	res := make([]customTypes.Role, len(vSlice))
-	for i := range vSlice {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNRole2githubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐRole(ctx, vSlice[i])
-		if err != nil {
-			return nil, err
-		}
-	}
-	return res, nil
-}
-
-func (ec *executionContext) marshalNRole2ᚕgithubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐRoleᚄ(ctx context.Context, sel ast.SelectionSet, v []customTypes.Role) graphql.Marshaler {
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalNRole2githubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐRole(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-
-	for _, e := range ret {
-		if e == graphql.Null {
-			return graphql.Null
-		}
-	}
-
-	return ret
 }
 
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {

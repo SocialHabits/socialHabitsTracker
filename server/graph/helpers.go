@@ -21,6 +21,24 @@ func MapAddressModelToGqlType(addressesModel []*models.Address) []*customTypes.A
 	return addresses
 }
 
+// ConvertModelRoleToEnum convert role name to graphql enum
+func ConvertModelRoleToEnum(roleName models.UserRole) *customTypes.Role {
+	var role customTypes.Role
+
+	switch roleName {
+	case "ADMIN":
+		role = customTypes.RoleAdmin
+	case "REGULAR":
+		role = customTypes.RoleRegular
+	case "PREMIUM":
+		role = customTypes.RolePremium
+	case "TRAINER":
+		role = customTypes.RoleTrainer
+	}
+
+	return &role
+}
+
 //
 //func MapRole()  {
 //

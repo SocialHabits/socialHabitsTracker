@@ -3,6 +3,7 @@ package middleware
 import (
 	"context"
 	"errors"
+	"fmt"
 	"github.com/AntonioTrupac/socialHabitsTracker/models"
 	"github.com/AntonioTrupac/socialHabitsTracker/util"
 	"github.com/gin-gonic/gin"
@@ -38,13 +39,15 @@ type CookieContent struct {
 func extractUserIdAndRoleName(ctx *gin.Context) (*CookieContent, error) {
 	c, err := ctx.Request.Cookie("jwt")
 	if err != nil {
-		return nil, errors.New("There is no token in cookies")
+		return nil, errors.New("there is no token in cookies")
 	}
 
 	claims, err := util.ValidateIdToken(c.Value)
 	if err != nil {
 		return nil, err
 	}
+
+	fmt.Println(claims)
 
 	return &CookieContent{UserId: claims.UserID, RoleName: claims.RoleName}, nil
 }
@@ -56,7 +59,7 @@ func setValInCtx(ctx *gin.Context, val interface{}) {
 
 func GetValFromCtx(ctx context.Context) *CookieAccess {
 	raw := ctx.Value(cookieAccessKeyCtx).(*CookieAccess)
-
+	fmt.Println("raw", raw)
 	return raw
 }
 
