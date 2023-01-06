@@ -7,7 +7,9 @@ import ButtonLink from '@/components/links/ButtonLink';
 import UnderlineLink from '@/components/links/UnderlineLink';
 import Seo from '@/components/Seo';
 
-import { useGetUsers } from '@/graphql';
+import { GetUsersDocument, useGetUsers } from '@/graphql';
+import { dehydrate, QueryClient } from '@tanstack/query-core';
+import { GraphQLClient } from 'graphql-request';
 
 // !STARTERCONF -> Select !STARTERCONF and CMD + SHIFT + F
 // Before you begin editing, follow all comments with `STARTERCONF`,
@@ -42,7 +44,7 @@ export default function HomePage() {
             </ButtonLink>
 
             <div>
-              {data?.getUsers.map((user) => (
+              {data?.getUsers?.map((user) => (
                 <div key={user.id}>{user.firstName}</div>
               ))}
             </div>
@@ -58,4 +60,21 @@ export default function HomePage() {
       </main>
     </Layout>
   );
+}
+
+export async function getServerSideProps() {
+  const queryClient = new QueryClient();
+
+  await queryClient.prefetchQuery(['GetUsers', {}], async () => {
+    const graphQLClient = new GraphQLClient('http://localhost:8080/query');
+    const { getUsers } = await graphQLClient.request(GetUsersDocument);
+
+    return getUsers;
+  });
+
+  return {
+    props: {
+      dehydratedState: dehydrate(queryClient),
+    },
+  };
 }
