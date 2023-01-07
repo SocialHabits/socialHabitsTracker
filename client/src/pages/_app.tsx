@@ -34,8 +34,6 @@ type AppPropsWithLayout = AppProps & {
 };
 
 function MyApp({ Component, pageProps }: AppPropsWithLayout) {
-  console.log(pageProps.dehydratedState.state);
-
   const getLayout =
     Component.getLayout ||
     function (page) {
