@@ -1,15 +1,16 @@
+import { dehydrate, QueryClient } from '@tanstack/query-core';
+import { GraphQLClient } from 'graphql-request';
 import * as React from 'react';
+import { ReactElement } from 'react';
 
 import { useGraphQLClient, useQueryStatusLogger } from '@/hooks';
 
-import Layout from '@/components/layout/Layout';
+import { LandingPageLayout } from '@/components/layout/LandingPageLayout';
 import ButtonLink from '@/components/links/ButtonLink';
 import UnderlineLink from '@/components/links/UnderlineLink';
 import Seo from '@/components/Seo';
 
-import { GetUsersDocument, useGetUsers } from '@/graphql';
-import { dehydrate, QueryClient } from '@tanstack/query-core';
-import { GraphQLClient } from 'graphql-request';
+import { useGetUsers } from '@/graphql';
 
 // !STARTERCONF -> Select !STARTERCONF and CMD + SHIFT + F
 // Before you begin editing, follow all comments with `STARTERCONF`,
@@ -32,8 +33,7 @@ export default function HomePage() {
   useQueryStatusLogger({ isFetching }, 'users');
 
   return (
-    <Layout>
-      {/* <Seo templateTitle='Home' /> */}
+    <>
       <Seo />
 
       <main>
@@ -43,11 +43,16 @@ export default function HomePage() {
               See all components
             </ButtonLink>
 
-            <div>
-              {data?.getUsers?.map((user) => (
-                <div key={user.id}>{user.firstName}</div>
-              ))}
-            </div>
+            {data?.getUsers && (
+              <div>
+                {data.getUsers.map((user) => (
+                  <div key={user.id}>
+                    <p>Name: {user.firstName}</p>
+                    <p>Role: {user.role}</p>
+                  </div>
+                ))}
+              </div>
+            )}
 
             <footer className='absolute bottom-2 text-gray-700'>
               © {new Date().getFullYear()} By{' '}
@@ -58,19 +63,22 @@ export default function HomePage() {
           </div>
         </section>
       </main>
-    </Layout>
+    </>
   );
 }
 
+HomePage.getLayout = function (page: ReactElement) {
+  return <LandingPageLayout>{page}</LandingPageLayout>;
+};
+
 export async function getServerSideProps() {
   const queryClient = new QueryClient();
+  const graphQLClient = new GraphQLClient('http://localhost:8080/query');
 
-  await queryClient.prefetchQuery(['GetUsers', {}], async () => {
-    const graphQLClient = new GraphQLClient('http://localhost:8080/query');
-    const { getUsers } = await graphQLClient.request(GetUsersDocument);
-
-    return getUsers;
-  });
+  await queryClient.prefetchQuery(
+    useGetUsers.getKey({}),
+    useGetUsers.fetcher(graphQLClient, {})
+  );
 
   return {
     props: {

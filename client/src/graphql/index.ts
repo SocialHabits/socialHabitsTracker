@@ -220,7 +220,7 @@ export type GetUsers = {
   }>;
 };
 
-export const LoginDocument = `
+export const LoginDocument = /*#__PURE__*/ `
     mutation Login($email: String!, $password: String!) {
   login(email: $email, password: $password)
 }
@@ -241,7 +241,12 @@ export const useLogin = <TError = unknown, TContext = unknown>(
       )(),
     options
   );
-export const GetUsersDocument = `
+useLogin.fetcher = (
+  client: GraphQLClient,
+  variables: LoginVariables,
+  headers?: RequestInit['headers']
+) => fetcher<Login, LoginVariables>(client, LoginDocument, variables, headers);
+export const GetUsersDocument = /*#__PURE__*/ `
     query GetUsers {
   getUsers {
     id
@@ -267,6 +272,9 @@ export const useGetUsers = <TData = GetUsers, TError = unknown>(
     ),
     options
   );
+
+useGetUsers.getKey = (variables?: GetUsersVariables) =>
+  variables === undefined ? ['GetUsers'] : ['GetUsers', variables];
 export const useInfiniteGetUsers = <TData = GetUsers, TError = unknown>(
   pageParamKey: keyof GetUsersVariables,
   client: GraphQLClient,
@@ -289,4 +297,20 @@ export const useInfiniteGetUsers = <TData = GetUsers, TError = unknown>(
         headers
       )(),
     options
+  );
+
+useInfiniteGetUsers.getKey = (variables?: GetUsersVariables) =>
+  variables === undefined
+    ? ['GetUsers.infinite']
+    : ['GetUsers.infinite', variables];
+useGetUsers.fetcher = (
+  client: GraphQLClient,
+  variables?: GetUsersVariables,
+  headers?: RequestInit['headers']
+) =>
+  fetcher<GetUsers, GetUsersVariables>(
+    client,
+    GetUsersDocument,
+    variables,
+    headers
   );

@@ -11,3 +11,7 @@ generates:
       fetcher: graphql-request
       omitOperationSuffix: true
       addInfiniteQuery: true
+      pureMagicComment: true
+      exposeQueryKeys: true
+      exposeFetcher: true
+      withHooks: true
