@@ -19,7 +19,7 @@ type FormValues = {
 };
 
 const SignUpForm = () => {
-  const { handleSubmit, register } = useForm<FormValues>();
+  const { handleSubmit, register, reset } = useForm<FormValues>();
   const { graphQLClient } = useGraphQLClient();
 
   const { mutate, data } = useCreateUser(graphQLClient);
@@ -45,6 +45,8 @@ const SignUpForm = () => {
         ],
       },
     });
+
+    reset();
   };
 
   return (
