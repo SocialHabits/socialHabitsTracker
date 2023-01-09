@@ -10,7 +10,6 @@ type FormValues = {
   email: string;
   password: string;
   role: string;
-  street: string;
   city: string;
   country: string;
 };
@@ -26,16 +25,15 @@ const SignUpForm = () => {
   return (
     <form
       onSubmit={handleSubmit(handleLogin)}
-      className='flex w-full flex-col rounded-3xl bg-gray-50 py-8 px-10 drop-shadow-2xl md:m-auto md:w-[800px] md:flex-grow-0 md:py-16 xl:w-[600px]'
+      className='flex w-full flex-col rounded-t-3xl px-10 py-8 md:my-10 md:mx-auto md:w-[800px] md:flex-grow-0 md:rounded-3xl md:bg-gray-50 md:py-10 md:drop-shadow-2xl xl:w-[600px]'
     >
-      <div className='mb-12'>
-        <h1 className='mb-4 font-medium'>Create an account</h1>
+      <div className='mb-8'>
+        <h1 className='mb-3 font-medium'>Create an account</h1>
         <p className='text-neutral-500'>
           Start tracking your habits by creating an account!
         </p>
       </div>
 
-      <h2 className='mb-6 font-normal'>Basic information</h2>
       <div className='mb-4 flex flex-col md:flex-row'>
         <div className='mb-4 flex w-full flex-col md:mr-4 md:mb-0'>
           <label className='mb-1' htmlFor='firstName'>
@@ -86,18 +84,12 @@ const SignUpForm = () => {
         </select>
       </div>
 
-      <h2 className='mb-6 font-normal'>Additional information</h2>
-
       <div className='mb-4 flex flex-col md:flex-row'>
         <div className='mb-4 flex w-full flex-col md:mb-0 md:mr-4'>
           <label className='mb-1' htmlFor='street'>
-            Street
+            Country
           </label>
-          <input
-            type='street'
-            {...register('street')}
-            className='form-input rounded-lg'
-          />
+          <input {...register('country')} className='form-input rounded-lg' />
         </div>
 
         <div className='flex w-full flex-col md:ml-4'>
@@ -111,15 +103,6 @@ const SignUpForm = () => {
           />
         </div>
       </div>
-
-      <label className='mb-1' htmlFor='country'>
-        Country
-      </label>
-      <input
-        type='country'
-        {...register('country')}
-        className='form-input mb-4 rounded-lg'
-      />
 
       <p>
         <span className='text-neutral-500'>
