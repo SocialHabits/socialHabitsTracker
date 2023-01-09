@@ -11,11 +11,6 @@ import Layout from '@/components/layout/Layout';
 
 import { GraphQLClientProvider } from '@/providers/GraphQLClientProvider';
 
-/**
- * !STARTERCONF info
- * ? `Layout` component is called in every page using `np` snippets. If you have consistent layout across all page, you can add it here too
- */
-
 // eslint-disable-next-line @typescript-eslint/ban-types
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement) => ReactNode;
