@@ -1,6 +1,8 @@
 import * as React from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
+
 import Button from '@/components/buttons/Button';
+import UnderlineLink from '@/components/links/UnderlineLink';
 
 type FormValues = {
   firstName: string;
@@ -24,23 +26,25 @@ const SignUpForm = () => {
   return (
     <form
       onSubmit={handleSubmit(handleLogin)}
-      className='mx-8 flex h-[700px] w-96 flex-grow flex-col rounded-3xl bg-zinc-100 py-16 px-10 drop-shadow-2xl'
+      className='flex w-full flex-col rounded-3xl bg-gray-50 py-8 px-10 drop-shadow-2xl md:m-auto md:w-[800px] md:flex-grow-0 md:py-16 xl:w-[600px]'
     >
       <div className='mb-12'>
-        <h1 className='mb-4'>Create an account</h1>
-        <p className='text-neutral-500'>Start tracking your habits!</p>
+        <h1 className='mb-4 font-medium'>Create an account</h1>
+        <p className='text-neutral-500'>
+          Start tracking your habits by creating an account!
+        </p>
       </div>
 
-      <h2 className='mb-6'>Basic information</h2>
-      <div className='mb-4 flex'>
-        <div className='mr-4 flex w-full flex-col'>
+      <h2 className='mb-6 font-normal'>Basic information</h2>
+      <div className='mb-4 flex flex-col md:flex-row'>
+        <div className='mb-4 flex w-full flex-col md:mr-4 md:mb-0'>
           <label className='mb-1' htmlFor='firstName'>
             First name
           </label>
           <input {...register('firstName')} className='form-input rounded-lg' />
         </div>
 
-        <div className='ml-4 flex w-full flex-col'>
+        <div className='flex w-full flex-col md:ml-4'>
           <label className='mb-1' htmlFor='lastName'>
             Last name
           </label>
@@ -48,8 +52,8 @@ const SignUpForm = () => {
         </div>
       </div>
 
-      <div className='mb-4 flex'>
-        <div className='mr-4 flex w-full flex-col'>
+      <div className='mb-4 flex flex-col md:flex-row'>
+        <div className='mb-4 flex w-full flex-col md:mb-0 md:mr-4'>
           <label className='mb-1' htmlFor='email'>
             Email
           </label>
@@ -60,7 +64,7 @@ const SignUpForm = () => {
           />
         </div>
 
-        <div className='ml-4 flex w-full flex-col'>
+        <div className='flex w-full flex-col md:ml-4'>
           <label className='mb-1' htmlFor='password'>
             Password
           </label>
@@ -72,7 +76,7 @@ const SignUpForm = () => {
         </div>
       </div>
 
-      <div className='mb-4 flex flex-col'>
+      <div className='mb-6 flex flex-col'>
         <label className='mb-1' htmlFor='role'>
           Role
         </label>
@@ -82,10 +86,10 @@ const SignUpForm = () => {
         </select>
       </div>
 
-      <h2>Additional information</h2>
+      <h2 className='mb-6 font-normal'>Additional information</h2>
 
-      <div className='flex'>
-        <div className='mr-4 flex w-full flex-col'>
+      <div className='mb-4 flex flex-col md:flex-row'>
+        <div className='mb-4 flex w-full flex-col md:mb-0 md:mr-4'>
           <label className='mb-1' htmlFor='street'>
             Street
           </label>
@@ -96,7 +100,7 @@ const SignUpForm = () => {
           />
         </div>
 
-        <div className='ml-4 flex w-full flex-col'>
+        <div className='flex w-full flex-col md:ml-4'>
           <label className='mb-1' htmlFor='city'>
             City
           </label>
@@ -114,12 +118,21 @@ const SignUpForm = () => {
       <input
         type='country'
         {...register('country')}
-        className='form-input rounded-lg'
+        className='form-input mb-4 rounded-lg'
       />
 
+      <p>
+        <span className='text-neutral-500'>
+          Already have an account? Log in{' '}
+        </span>
+        <UnderlineLink href='/auth/login' className='text-primary-500'>
+          here
+        </UnderlineLink>
+      </p>
+
       <div className='flex justify-end'>
-        <Button type='submit' className='mt-4'>
-          Sign up
+        <Button type='submit' className='mt-4 rounded-lg'>
+          Create Account
         </Button>
       </div>
     </form>

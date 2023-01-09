@@ -7,7 +7,6 @@ import { useGraphQLClient, useQueryStatusLogger } from '@/hooks';
 
 import { LandingPageLayout } from '@/components/layout/LandingPageLayout';
 import ButtonLink from '@/components/links/ButtonLink';
-import UnderlineLink from '@/components/links/UnderlineLink';
 import Seo from '@/components/Seo';
 
 import { useGetUsers } from '@/graphql';

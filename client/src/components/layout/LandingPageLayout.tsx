@@ -1,19 +1,19 @@
-import Link from 'next/link';
-import { ReactNode } from 'react';
 import { useRouter } from 'next/router';
+import { ReactNode } from 'react';
+
 import ButtonLink from '@/components/links/ButtonLink';
 import UnderlineLink from '@/components/links/UnderlineLink';
 
 export const LandingPageLayout = ({ children }: { children: ReactNode }) => {
   const router = useRouter();
-  console.log(router);
+
   return (
     <>
       <header>
         <nav className='flex h-20 items-center justify-between px-8'>
           <div className='w-10'>Logo</div>
 
-          <div className='flex items-center justify-between'>
+          <div className='hidden items-center justify-between md:flex'>
             <ul className='flex'>
               <li className='px-4'>
                 <UnderlineLink href='/' className='text-lg font-medium'>
