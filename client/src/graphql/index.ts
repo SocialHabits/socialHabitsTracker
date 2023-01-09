@@ -1,37 +1,18 @@
 import { GraphQLClient } from 'graphql-request';
 import { RequestInit } from 'graphql-request/dist/types.dom';
-import {
-  useMutation,
-  useQuery,
-  useInfiniteQuery,
-  UseMutationOptions,
-  UseQueryOptions,
-  UseInfiniteQueryOptions,
-} from '@tanstack/react-query';
+import { useMutation, useQuery, useInfiniteQuery, UseMutationOptions, UseQueryOptions, UseInfiniteQueryOptions } from '@tanstack/react-query';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
-export type Exact<T extends { [key: string]: unknown }> = {
-  [K in keyof T]: T[K];
-};
-export type MakeOptional<T, K extends keyof T> = Omit<T, K> & {
-  [SubKey in K]?: Maybe<T[SubKey]>;
-};
-export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & {
-  [SubKey in K]: Maybe<T[SubKey]>;
-};
+export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
+export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
+export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
 
-function fetcher<TData, TVariables extends { [key: string]: any }>(
-  client: GraphQLClient,
-  query: string,
-  variables?: TVariables,
-  requestHeaders?: RequestInit['headers']
-) {
-  return async (): Promise<TData> =>
-    client.request({
-      document: query,
-      variables,
-      requestHeaders,
-    });
+function fetcher<TData, TVariables extends { [key: string]: any }>(client: GraphQLClient, query: string, variables?: TVariables, requestHeaders?: RequestInit['headers']) {
+  return async (): Promise<TData> => client.request({
+    document: query,
+    variables,
+    requestHeaders
+  });
 }
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
@@ -86,43 +67,53 @@ export type Mutation = {
   updateUser: User;
 };
 
+
 export type MutationCreateBookArgs = {
   input: BookInput;
 };
 
+
 export type MutationDeleteBookArgs = {
   id: Scalars['Int'];
 };
+
 
 export type MutationUpdateBookArgs = {
   id: Scalars['Int'];
   input: BookInput;
 };
 
+
 export type MutationCreateTodoArgs = {
   text: Scalars['String'];
 };
+
 
 export type MutationCreateUserArgs = {
   input: UserInput;
 };
 
+
 export type MutationDeleteTodoArgs = {
   todoId: Scalars['ID'];
 };
 
+
 export type MutationDeleteUserArgs = {
   id: Scalars['ID'];
 };
+
 
 export type MutationLoginArgs = {
   email: Scalars['String'];
   password: Scalars['String'];
 };
 
+
 export type MutationUpdateTodoArgs = {
   input: TodoInput;
 };
+
 
 export type MutationUpdateUserArgs = {
   id: Scalars['ID'];
@@ -140,17 +131,21 @@ export type Query = {
   getUsers: Array<User>;
 };
 
+
 export type QueryGetOneBookArgs = {
   id: Scalars['Int'];
 };
+
 
 export type QueryGetRoleArgs = {
   id: Scalars['Int'];
 };
 
+
 export type QueryGetTodoArgs = {
   todoId: Scalars['ID'];
 };
+
 
 export type QueryGetUserArgs = {
   id: Scalars['ID'];
@@ -160,7 +155,7 @@ export enum Role {
   Admin = 'ADMIN',
   Premium = 'PREMIUM',
   Regular = 'REGULAR',
-  Trainer = 'TRAINER',
+  Trainer = 'TRAINER'
 }
 
 export type RoleInput = {
@@ -205,47 +200,66 @@ export type LoginVariables = Exact<{
   password: Scalars['String'];
 }>;
 
-export type Login = { __typename?: 'Mutation'; login: any };
 
-export type GetUsersVariables = Exact<{ [key: string]: never }>;
+export type Login = { __typename?: 'Mutation', login: any };
 
-export type GetUsers = {
-  __typename?: 'Query';
-  getUsers: Array<{
-    __typename?: 'User';
-    id: string;
-    email: string;
-    firstName: string;
-    role: Role;
-  }>;
-};
+export type CreateUserVariables = Exact<{
+  input: UserInput;
+}>;
+
+
+export type CreateUser = { __typename?: 'Mutation', createUser: { __typename?: 'User', id: string, email: string, firstName: string, lastName: string, role: Role } };
+
+export type GetUsersVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetUsers = { __typename?: 'Query', getUsers: Array<{ __typename?: 'User', id: string, email: string, firstName: string, role: Role }> };
+
 
 export const LoginDocument = /*#__PURE__*/ `
     mutation Login($email: String!, $password: String!) {
   login(email: $email, password: $password)
 }
     `;
-export const useLogin = <TError = unknown, TContext = unknown>(
-  client: GraphQLClient,
-  options?: UseMutationOptions<Login, TError, LoginVariables, TContext>,
-  headers?: RequestInit['headers']
-) =>
-  useMutation<Login, TError, LoginVariables, TContext>(
-    ['Login'],
-    (variables?: LoginVariables) =>
-      fetcher<Login, LoginVariables>(
-        client,
-        LoginDocument,
-        variables,
-        headers
-      )(),
-    options
-  );
-useLogin.fetcher = (
-  client: GraphQLClient,
-  variables: LoginVariables,
-  headers?: RequestInit['headers']
-) => fetcher<Login, LoginVariables>(client, LoginDocument, variables, headers);
+export const useLogin = <
+      TError = unknown,
+      TContext = unknown
+    >(
+      client: GraphQLClient,
+      options?: UseMutationOptions<Login, TError, LoginVariables, TContext>,
+      headers?: RequestInit['headers']
+    ) =>
+    useMutation<Login, TError, LoginVariables, TContext>(
+      ['Login'],
+      (variables?: LoginVariables) => fetcher<Login, LoginVariables>(client, LoginDocument, variables, headers)(),
+      options
+    );
+useLogin.fetcher = (client: GraphQLClient, variables: LoginVariables, headers?: RequestInit['headers']) => fetcher<Login, LoginVariables>(client, LoginDocument, variables, headers);
+export const CreateUserDocument = /*#__PURE__*/ `
+    mutation CreateUser($input: UserInput!) {
+  createUser(input: $input) {
+    id
+    email
+    firstName
+    lastName
+    role
+  }
+}
+    `;
+export const useCreateUser = <
+      TError = unknown,
+      TContext = unknown
+    >(
+      client: GraphQLClient,
+      options?: UseMutationOptions<CreateUser, TError, CreateUserVariables, TContext>,
+      headers?: RequestInit['headers']
+    ) =>
+    useMutation<CreateUser, TError, CreateUserVariables, TContext>(
+      ['CreateUser'],
+      (variables?: CreateUserVariables) => fetcher<CreateUser, CreateUserVariables>(client, CreateUserDocument, variables, headers)(),
+      options
+    );
+useCreateUser.fetcher = (client: GraphQLClient, variables: CreateUserVariables, headers?: RequestInit['headers']) => fetcher<CreateUser, CreateUserVariables>(client, CreateUserDocument, variables, headers);
 export const GetUsersDocument = /*#__PURE__*/ `
     query GetUsers {
   getUsers {
@@ -256,61 +270,42 @@ export const GetUsersDocument = /*#__PURE__*/ `
   }
 }
     `;
-export const useGetUsers = <TData = GetUsers, TError = unknown>(
-  client: GraphQLClient,
-  variables?: GetUsersVariables,
-  options?: UseQueryOptions<GetUsers, TError, TData>,
-  headers?: RequestInit['headers']
-) =>
-  useQuery<GetUsers, TError, TData>(
-    variables === undefined ? ['GetUsers'] : ['GetUsers', variables],
-    fetcher<GetUsers, GetUsersVariables>(
-      client,
-      GetUsersDocument,
-      variables,
-      headers
-    ),
-    options
-  );
+export const useGetUsers = <
+      TData = GetUsers,
+      TError = unknown
+    >(
+      client: GraphQLClient,
+      variables?: GetUsersVariables,
+      options?: UseQueryOptions<GetUsers, TError, TData>,
+      headers?: RequestInit['headers']
+    ) =>
+    useQuery<GetUsers, TError, TData>(
+      variables === undefined ? ['GetUsers'] : ['GetUsers', variables],
+      fetcher<GetUsers, GetUsersVariables>(client, GetUsersDocument, variables, headers),
+      options
+    );
 
-useGetUsers.getKey = (variables?: GetUsersVariables) =>
-  variables === undefined ? ['GetUsers'] : ['GetUsers', variables];
-export const useInfiniteGetUsers = <TData = GetUsers, TError = unknown>(
-  pageParamKey: keyof GetUsersVariables,
-  client: GraphQLClient,
-  variables?: GetUsersVariables,
-  options?: UseInfiniteQueryOptions<GetUsers, TError, TData>,
-  headers?: RequestInit['headers']
-) =>
-  useInfiniteQuery<GetUsers, TError, TData>(
-    variables === undefined
-      ? ['GetUsers.infinite']
-      : ['GetUsers.infinite', variables],
-    (metaData) =>
-      fetcher<GetUsers, GetUsersVariables>(
-        client,
-        GetUsersDocument,
-        {
-          ...variables,
-          ...(metaData.pageParam ? { [pageParamKey]: metaData.pageParam } : {}),
-        },
-        headers
-      )(),
-    options
-  );
+useGetUsers.getKey = (variables?: GetUsersVariables) => variables === undefined ? ['GetUsers'] : ['GetUsers', variables];
+;
 
-useInfiniteGetUsers.getKey = (variables?: GetUsersVariables) =>
-  variables === undefined
-    ? ['GetUsers.infinite']
-    : ['GetUsers.infinite', variables];
-useGetUsers.fetcher = (
-  client: GraphQLClient,
-  variables?: GetUsersVariables,
-  headers?: RequestInit['headers']
-) =>
-  fetcher<GetUsers, GetUsersVariables>(
-    client,
-    GetUsersDocument,
-    variables,
-    headers
-  );
+export const useInfiniteGetUsers = <
+      TData = GetUsers,
+      TError = unknown
+    >(
+      pageParamKey: keyof GetUsersVariables,
+      client: GraphQLClient,
+      variables?: GetUsersVariables,
+      options?: UseInfiniteQueryOptions<GetUsers, TError, TData>,
+      headers?: RequestInit['headers']
+    ) =>
+    useInfiniteQuery<GetUsers, TError, TData>(
+      variables === undefined ? ['GetUsers.infinite'] : ['GetUsers.infinite', variables],
+      (metaData) => fetcher<GetUsers, GetUsersVariables>(client, GetUsersDocument, {...variables, ...(metaData.pageParam ? {[pageParamKey]: metaData.pageParam} : {})}, headers)(),
+      options
+    );
+
+
+useInfiniteGetUsers.getKey = (variables?: GetUsersVariables) => variables === undefined ? ['GetUsers.infinite'] : ['GetUsers.infinite', variables];
+;
+
+useGetUsers.fetcher = (client: GraphQLClient, variables?: GetUsersVariables, headers?: RequestInit['headers']) => fetcher<GetUsers, GetUsersVariables>(client, GetUsersDocument, variables, headers);

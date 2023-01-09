@@ -1,25 +1,50 @@
 import * as React from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 
+import { useGraphQLClient } from '@/hooks';
+
 import Button from '@/components/buttons/Button';
 import UnderlineLink from '@/components/links/UnderlineLink';
+
+import { Role, useCreateUser } from '@/graphql';
 
 type FormValues = {
   firstName: string;
   lastName: string;
   email: string;
   password: string;
-  role: string;
+  role: Role;
   city: string;
   country: string;
 };
 
 const SignUpForm = () => {
   const { handleSubmit, register } = useForm<FormValues>();
+  const { graphQLClient } = useGraphQLClient();
+
+  const { mutate, data } = useCreateUser(graphQLClient);
+
+  console.log(data);
 
   const handleLogin: SubmitHandler<FormValues> = (data) => {
     // TODO: Handle login
     console.log(data);
+    mutate({
+      input: {
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        password: data.password,
+        role: data.role,
+        address: [
+          {
+            city: data.city,
+            country: data.country,
+            street: '123 Main St',
+          },
+        ],
+      },
+    });
   };
 
   return (
@@ -27,7 +52,7 @@ const SignUpForm = () => {
       onSubmit={handleSubmit(handleLogin)}
       className='flex w-full flex-col rounded-t-3xl px-10 py-8 md:my-10 md:mx-auto md:w-[800px] md:flex-grow-0 md:rounded-3xl md:bg-gray-50 md:py-10 md:drop-shadow-2xl xl:w-[600px]'
     >
-      <div className='mb-8'>
+      <div className='mb-8 text-center'>
         <h1 className='mb-3 font-medium'>Create an account</h1>
         <p className='text-neutral-500'>
           Start tracking your habits by creating an account!
@@ -79,8 +104,8 @@ const SignUpForm = () => {
           Role
         </label>
         <select className='form-input rounded-lg' {...register('role')}>
-          <option value='REGULAR'>Regular</option>
-          <option value='TRAINER'>Trainer</option>
+          <option value={Role.Regular}>Regular</option>
+          <option value={Role.Regular}>Trainer</option>
         </select>
       </div>
 
