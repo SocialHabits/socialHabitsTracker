@@ -20,7 +20,3 @@ export default function SignUp() {
     </section>
   );
 }
-
-SignUp.getLayout = function (page: ReactElement) {
-  return <LandingPageLayout>{page}</LandingPageLayout>;
-};
