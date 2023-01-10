@@ -60,3 +60,22 @@ export const SignUpFormSchema = z.object({
     }),
   ]),
 });
+
+export const LoginFormSchema = z.object({
+  email: z
+    .string({
+      required_error: 'Email is required',
+      invalid_type_error: 'Email must be a string',
+    })
+    .email({ message: 'Email is required' })
+    .min(5, { message: 'Email must be atleast 5 characters long' }),
+  password: z
+    .string({
+      required_error: 'Password is required',
+      invalid_type_error: 'Password must be a string',
+    })
+    .min(8, { message: 'Password must be atleast 8 characters long' })
+    .max(255, {
+      message: 'Password can be atmost 255 characters long',
+    }),
+});
