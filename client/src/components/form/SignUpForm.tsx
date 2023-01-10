@@ -1,32 +1,34 @@
+import { zodResolver } from '@hookform/resolvers/zod';
 import * as React from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
+import { z } from 'zod';
 
 import { useGraphQLClient } from '@/hooks';
 
 import Button from '@/components/buttons/Button';
+import { SignUpFormSchema } from '@/components/form/validation';
 import UnderlineLink from '@/components/links/UnderlineLink';
 
 import { Role, useCreateUser } from '@/graphql';
 
-type FormValues = {
-  firstName: string;
-  lastName: string;
-  email: string;
-  password: string;
-  role: Role;
-  city: string;
-  country: string;
-};
+type FormValuesSchema = z.infer<typeof SignUpFormSchema>;
 
 const SignUpForm = () => {
-  const { handleSubmit, register, reset } = useForm<FormValues>();
+  const {
+    handleSubmit,
+    register,
+    reset,
+    formState: { isSubmitting, errors },
+  } = useForm<FormValuesSchema>({
+    resolver: zodResolver(SignUpFormSchema),
+  });
   const { graphQLClient } = useGraphQLClient();
 
   const { mutate, data } = useCreateUser(graphQLClient);
 
   console.log(data);
 
-  const handleLogin: SubmitHandler<FormValues> = (data) => {
+  const handleLogin: SubmitHandler<FormValuesSchema> = (data) => {
     // TODO: Handle login
     console.log(data);
     mutate({
@@ -38,8 +40,8 @@ const SignUpForm = () => {
         role: data.role,
         address: [
           {
-            city: data.city,
-            country: data.country,
+            city: data.address[0].city,
+            country: data.address[0].country,
             street: '123 Main St',
           },
         ],
@@ -67,6 +69,12 @@ const SignUpForm = () => {
             First name
           </label>
           <input {...register('firstName')} className='form-input rounded-lg' />
+
+          {errors.firstName && (
+            <p className='mt-1 text-sm text-red-500'>
+              {errors.firstName.message}
+            </p>
+          )}
         </div>
 
         <div className='flex w-full flex-col md:ml-4'>
@@ -74,6 +82,11 @@ const SignUpForm = () => {
             Last name
           </label>
           <input {...register('lastName')} className='form-input rounded-lg' />
+          {errors.lastName && (
+            <p className='mt-1 text-sm text-red-500'>
+              {errors.lastName.message}
+            </p>
+          )}
         </div>
       </div>
 
@@ -87,6 +100,9 @@ const SignUpForm = () => {
             {...register('email')}
             className='form-input rounded-lg'
           />
+          {errors.email && (
+            <p className='mt-1 text-sm text-red-500'>{errors.email.message}</p>
+          )}
         </div>
 
         <div className='flex w-full flex-col md:ml-4'>
@@ -98,6 +114,11 @@ const SignUpForm = () => {
             {...register('password')}
             className='form-input rounded-lg'
           />
+          {errors.password && (
+            <p className='mt-1 text-sm text-red-500'>
+              {errors.password.message}
+            </p>
+          )}
         </div>
       </div>
 
@@ -107,8 +128,11 @@ const SignUpForm = () => {
         </label>
         <select className='form-input rounded-lg' {...register('role')}>
           <option value={Role.Regular}>Regular</option>
-          <option value={Role.Regular}>Trainer</option>
+          <option value={Role.Trainer}>Trainer</option>
         </select>
+        {errors.role && (
+          <p className='mt-1 text-sm text-red-500'>{errors.role.message}</p>
+        )}
       </div>
 
       <div className='mb-4 flex flex-col md:flex-row'>
@@ -116,7 +140,15 @@ const SignUpForm = () => {
           <label className='mb-1' htmlFor='street'>
             Country
           </label>
-          <input {...register('country')} className='form-input rounded-lg' />
+          <input
+            {...register('address.0.country')}
+            className='form-input rounded-lg'
+          />
+          {errors.address?.[0]?.country && (
+            <p className='mt-1 text-sm text-red-500'>
+              {errors.address[0].country.message}
+            </p>
+          )}
         </div>
 
         <div className='flex w-full flex-col md:ml-4'>
@@ -125,9 +157,15 @@ const SignUpForm = () => {
           </label>
           <input
             type='city'
-            {...register('city')}
+            {...register('address.0.city')}
             className='form-input rounded-lg'
           />
+
+          {errors.address?.[0]?.city && (
+            <p className='mt-1 text-sm text-red-500'>
+              {errors.address[0].city.message}
+            </p>
+          )}
         </div>
       </div>
 
@@ -141,7 +179,11 @@ const SignUpForm = () => {
       </p>
 
       <div className='flex justify-end'>
-        <Button type='submit' className='mt-4 rounded-lg'>
+        <Button
+          type='submit'
+          className='mt-4 rounded-lg'
+          disabled={isSubmitting}
+        >
           Create Account
         </Button>
       </div>
