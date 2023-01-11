@@ -28,6 +28,8 @@ func (access *CookieAccess) SetToken(token string) {
 		HttpOnly: true,
 		Path:     "/",
 		Expires:  time.Now().Add(time.Hour * 24),
+		SameSite: http.SameSiteLaxMode,
+		MaxAge:   60 * 5,
 	})
 }
 
@@ -38,18 +40,27 @@ type CookieContent struct {
 
 func extractUserIdAndRoleName(ctx *gin.Context) (*CookieContent, error) {
 	c, err := ctx.Request.Cookie("jwt")
-	if err != nil {
+	if err != nil || c.Value == "" {
 		return nil, errors.New("there is no token in cookies")
 	}
 
-	claims, err := util.ValidateIdToken(c.Value)
-	if err != nil {
-		return nil, err
+	claims, token, err := util.ValidateIdToken(c.Value)
+
+	if err != nil || !token.Valid {
+		fmt.Println("WE HERE NOW 2")
+		ctx.JSON(401, gin.H{
+			"error": "invalid token",
+		})
+		ctx.Abort()
+
+		return nil, ctx.AbortWithError(401, gin.Error{
+			Err: errors.New("invalid token"),
+		})
 	}
 
 	fmt.Println(claims)
 
-	return &CookieContent{UserId: claims.UserID, RoleName: claims.RoleName}, nil
+	return &CookieContent{UserId: claims.UserID, RoleName: claims.RoleName}, err
 }
 
 func setValInCtx(ctx *gin.Context, val interface{}) {
@@ -68,6 +79,8 @@ func AuthMiddleware() gin.HandlerFunc {
 		cookieA := CookieAccess{
 			Writer: ctx.Writer,
 		}
+
+		fmt.Println("WE HERE")
 
 		// &cookieA is a pointer so any changes in future is changing cookieA is context
 		setValInCtx(ctx, &cookieA)

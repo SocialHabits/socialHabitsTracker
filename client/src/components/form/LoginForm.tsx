@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useRouter } from 'next/router';
 import * as React from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -14,6 +15,7 @@ import { useLogin } from '@/graphql';
 type FormValuesSchema = z.infer<typeof LoginFormSchema>;
 
 const LoginForm = () => {
+  const router = useRouter();
   const {
     handleSubmit,
     register,
@@ -24,10 +26,19 @@ const LoginForm = () => {
   });
   const { graphQLClient } = useGraphQLClient();
 
-  const { mutate, data } = useLogin(graphQLClient);
+  const { mutate, data } = useLogin(graphQLClient, {
+    onSuccess: () => {
+      router.push('/dashboard');
+    },
+  });
 
   const handleLogin: SubmitHandler<FormValuesSchema> = (data) => {
-    console.log(data);
+    mutate({
+      email: data.email,
+      password: data.password,
+    });
+
+    reset();
   };
 
   return (
