@@ -26,7 +26,7 @@ const LoginForm = () => {
   });
   const { graphQLClient } = useGraphQLClient();
 
-  const { mutate, error, isError, status } = useLogin<Error>(graphQLClient, {
+  const { mutate, error, isError } = useLogin<Error>(graphQLClient, {
     onSuccess: () => {
       router.push('/dashboard');
     },

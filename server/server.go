@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/AntonioTrupac/socialHabitsTracker/database"
+	"github.com/AntonioTrupac/socialHabitsTracker/directives"
 	generated "github.com/AntonioTrupac/socialHabitsTracker/graph"
 	resolvers "github.com/AntonioTrupac/socialHabitsTracker/graph/resolvers"
 	"github.com/AntonioTrupac/socialHabitsTracker/middleware"
@@ -25,10 +26,14 @@ func graphqlHandler(db *gorm.DB) gin.HandlerFunc {
 	bookRepo := repository.NewBookService(db)
 	userRepo := repository.NewUserService(db)
 
-	h := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &resolvers.Resolver{
+	c := generated.Config{Resolvers: &resolvers.Resolver{
 		BookRepository: bookRepo,
 		UserRepository: userRepo,
-	}}))
+	}}
+
+	c.Directives.Binding = directives.Binding
+
+	h := handler.NewDefaultServer(generated.NewExecutableSchema(c))
 
 	return func(c *gin.Context) {
 		h.ServeHTTP(c.Writer, c.Request)

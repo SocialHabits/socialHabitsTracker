@@ -24,10 +24,10 @@ type Address {
 }
 
 input UserInput {
-    firstName: String!
-    lastName: String!
-    email: String!
-    password: String!
+    firstName: String! @binding(constraint: "required,max=255")
+    lastName: String! @binding(constraint: "required,max=255")
+    email: String! @binding(constraint: "required,max=255")
+    password: String! @binding(constraint: "required,max=50")
     address: [AddressInput!]!
     role: Role!
 }
