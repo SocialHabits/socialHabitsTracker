@@ -132,7 +132,7 @@ func (u UserService) Login(ctx context.Context, email, password string) (interfa
 		// if user not found
 		if err == gorm.ErrRecordNotFound {
 			return nil, &gqlerror.Error{
-				Message: "User with this email not found",
+				Message: "User with this email does not exist",
 			}
 		}
 

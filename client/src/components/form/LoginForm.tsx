@@ -26,7 +26,7 @@ const LoginForm = () => {
   });
   const { graphQLClient } = useGraphQLClient();
 
-  const { mutate, data } = useLogin(graphQLClient, {
+  const { mutate, error, isError, status } = useLogin<Error>(graphQLClient, {
     onSuccess: () => {
       router.push('/dashboard');
     },
@@ -92,6 +92,12 @@ const LoginForm = () => {
         </UnderlineLink>
       </p>
 
+      {isError && (
+        <p className='mt-2 text-sm text-red-500'>
+          {error?.response.errors[0].message}
+        </p>
+      )}
+
       <div className='flex justify-end'>
         <Button
           type='submit'
@@ -103,6 +109,14 @@ const LoginForm = () => {
       </div>
     </form>
   );
+};
+
+type Error = {
+  response: {
+    errors: {
+      message: string;
+    }[];
+  };
 };
 
 export default LoginForm;
