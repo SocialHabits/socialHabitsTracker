@@ -19,7 +19,13 @@ import (
 // CreateUser is the resolver for the createUser field.
 func (r *mutationResolver) CreateUser(ctx context.Context, input customTypes.UserInput) (*customTypes.User, error) {
 	// check email
-	util.CheckEmail(input.Email)
+	validEmail := util.CheckEmail(input.Email)
+
+	if !validEmail {
+		return nil, &gqlerror.Error{
+			Message: "Invalid email",
+		}
+	}
 
 	// check if user email already exists
 	userExists, err := r.UserRepository.CheckUserEmail(input.Email)

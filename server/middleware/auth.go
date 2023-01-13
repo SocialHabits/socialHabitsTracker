@@ -58,8 +58,6 @@ func extractUserIdAndRoleName(ctx *gin.Context) (*CookieContent, error) {
 		})
 	}
 
-	fmt.Println(claims)
-
 	return &CookieContent{UserId: claims.UserID, RoleName: claims.RoleName}, err
 }
 
@@ -70,7 +68,6 @@ func setValInCtx(ctx *gin.Context, val interface{}) {
 
 func GetValFromCtx(ctx context.Context) *CookieAccess {
 	raw := ctx.Value(cookieAccessKeyCtx).(*CookieAccess)
-	fmt.Println("raw", raw)
 	return raw
 }
 
@@ -79,8 +76,6 @@ func AuthMiddleware() gin.HandlerFunc {
 		cookieA := CookieAccess{
 			Writer: ctx.Writer,
 		}
-
-		fmt.Println("WE HERE")
 
 		// &cookieA is a pointer so any changes in future is changing cookieA is context
 		setValInCtx(ctx, &cookieA)

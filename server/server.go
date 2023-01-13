@@ -22,6 +22,15 @@ import (
 
 const defaultPort = "8080"
 
+func init() {
+	defaultTranslation()
+}
+
+func defaultTranslation() {
+	directives.ValidateAddTranslation("email", "Email is not valid")
+	directives.ValidateAddTranslation("address", "Address is required")
+}
+
 func graphqlHandler(db *gorm.DB) gin.HandlerFunc {
 	bookRepo := repository.NewBookService(db)
 	userRepo := repository.NewUserService(db)
@@ -58,7 +67,6 @@ func main() {
 	}
 
 	db.AutoMigrate(&models.Book{}, &models.User{}, &models.Address{})
-	//db.Migrator().AddColumn(&models.User{}, "role")
 
 	port := os.Getenv("PORT")
 	if port == "" {
