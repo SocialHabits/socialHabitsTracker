@@ -28,7 +28,6 @@ func init() {
 
 func defaultTranslation() {
 	directives.ValidateAddTranslation("email", "Email is not valid")
-	directives.ValidateAddTranslation("address", "Address is required")
 }
 
 func graphqlHandler(db *gorm.DB) gin.HandlerFunc {

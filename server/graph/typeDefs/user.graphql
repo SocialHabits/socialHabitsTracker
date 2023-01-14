@@ -28,7 +28,7 @@ input UserInput {
     lastName: String! @binding(constraint: "required,max=255")
     email: String! @binding(constraint: "required,email")
     password: String! @binding(constraint: "required,min=8,max=50")
-    address: [AddressInput!]! @binding(constraint: "required,dive,required")
+    address: [AddressInput!]! @binding(constraint: "dive,omitempty,required")
     role: Role! @binding(constraint: "required")
 }
 

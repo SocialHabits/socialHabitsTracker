@@ -5002,7 +5002,7 @@ func (ec *executionContext) unmarshalInputUserInput(ctx context.Context, obj int
 				return ec.unmarshalNAddressInput2ᚕᚖgithubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐAddressInputᚄ(ctx, v)
 			}
 			directive1 := func(ctx context.Context) (interface{}, error) {
-				constraint, err := ec.unmarshalNString2string(ctx, "required,dive,required")
+				constraint, err := ec.unmarshalNString2string(ctx, "dive,omitempty,required")
 				if err != nil {
 					return nil, err
 				}

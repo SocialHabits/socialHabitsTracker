@@ -61,7 +61,7 @@ func (u UserService) GetUsers() ([]*models.User, error) {
 
 // CheckUserEmail check if user email already exists
 func (u UserService) CheckUserEmail(email string) (bool, error) {
-	var user models.User
+	var user *models.User
 
 	err := u.Db.Model(&models.User{}).Where("email = ?", email).First(&user).Error
 
@@ -91,7 +91,7 @@ func (u UserService) CreateUser(userInput *customTypes.UserInput) (*models.User,
 
 		address := mapAddressInput(userInput.Address, user.ID)
 
-		if err := tx.Create(&address).Error; err != nil {
+		if err := tx.Create(address).Error; err != nil {
 			fmt.Printf("Error creating address: %v", err)
 			return err
 		}

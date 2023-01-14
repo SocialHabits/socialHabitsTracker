@@ -7,7 +7,6 @@ package graph
 import (
 	"context"
 	"fmt"
-
 	"github.com/99designs/gqlgen/graphql"
 	generated "github.com/AntonioTrupac/socialHabitsTracker/graph"
 	"github.com/AntonioTrupac/socialHabitsTracker/graph/customTypes"
@@ -22,6 +21,9 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input customTypes.Use
 	validEmail := util.CheckEmail(input.Email)
 
 	if !validEmail {
+		graphql.AddError(ctx, &gqlerror.Error{
+			Message: "Email is not valid",
+		})
 		return nil, &gqlerror.Error{
 			Message: "Invalid email",
 		}
@@ -45,12 +47,14 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input customTypes.Use
 		Email:     user.Email,
 		Password:  user.Password,
 		Address:   generated.MapAddressModelToGqlType(user.Address),
-		Role:      input.Role,
+		Role:      generated.ConvertModelRoleToEnum(user.Role),
 		ID:        int(user.ID),
 	}
 
 	if err != nil {
-		return nil, err
+		return nil, &gqlerror.Error{
+			Message: "Could not create user",
+		}
 	}
 
 	return createdUser, nil
@@ -93,8 +97,9 @@ func (r *queryResolver) GetUser(ctx context.Context, id int) (*customTypes.User,
 	}
 
 	if err != nil {
-		fmt.Println("Could not return user by id")
-		return nil, err
+		return nil, &gqlerror.Error{
+			Message: "Could not return user by id",
+		}
 	}
 
 	return userGql, nil

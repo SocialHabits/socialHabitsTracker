@@ -10,9 +10,9 @@ func MapAddressModelToGqlType(addressesModel []*models.Address) []*customTypes.A
 
 	for _, address := range addressesModel {
 		addresses = append(addresses, &customTypes.Address{
+			Street:  address.Street,
 			City:    address.City,
 			Country: address.Country,
-			Street:  address.Street,
 			ID:      int(address.ID),
 			UserID:  int(address.UserID),
 		})
