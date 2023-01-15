@@ -6,7 +6,9 @@ package graph
 
 import (
 	"context"
+	"errors"
 	"fmt"
+
 	"github.com/99designs/gqlgen/graphql"
 	generated "github.com/AntonioTrupac/socialHabitsTracker/graph"
 	"github.com/AntonioTrupac/socialHabitsTracker/graph/customTypes"
@@ -15,8 +17,18 @@ import (
 	"github.com/vektah/gqlparser/v2/gqlerror"
 )
 
+var (
+	ErrInput = errors.New("input errors")
+)
+
 // CreateUser is the resolver for the createUser field.
 func (r *mutationResolver) CreateUser(ctx context.Context, input customTypes.UserInput) (*customTypes.User, error) {
+	isValid := validation(ctx, input)
+
+	if !isValid {
+		return nil, ErrInput
+	}
+
 	// check email
 	validEmail := util.CheckEmail(input.Email)
 

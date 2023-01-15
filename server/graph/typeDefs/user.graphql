@@ -24,18 +24,18 @@ type Address {
 }
 
 input UserInput {
-    firstName: String! @binding(constraint: "required,max=255")
-    lastName: String! @binding(constraint: "required,max=255")
-    email: String! @binding(constraint: "required,email")
-    password: String! @binding(constraint: "required,min=8,max=50")
-    address: [AddressInput!]! @binding(constraint: "dive,omitempty,required")
-    role: Role! @binding(constraint: "required")
+    firstName: String!
+    lastName: String!
+    email: String!
+    password: String!
+    address: [AddressInput!]!
+    role: Role!
 }
 
 input AddressInput {
-    street: String! @binding(constraint: "required,max=255")
-    city: String! @binding(constraint: "required,max=255")
-    country: String! @binding(constraint: "required,max=255")
+    street: String!
+    city: String!
+    country: String!
 }
 
 input RoleInput {

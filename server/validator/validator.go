@@ -1,4 +1,8 @@
-package validation
+package validator
+
+type Validation interface {
+	Validate() (bool, map[string]string)
+}
 
 type Validator struct {
 	Errors map[string]string
@@ -10,6 +14,6 @@ func New() *Validator {
 	}
 }
 
-func (v *Validator) isValid() bool {
+func (v *Validator) IsValid() bool {
 	return len(v.Errors) == 0
 }

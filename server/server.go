@@ -2,7 +2,6 @@ package main
 
 import (
 	"github.com/AntonioTrupac/socialHabitsTracker/database"
-	"github.com/AntonioTrupac/socialHabitsTracker/directives"
 	generated "github.com/AntonioTrupac/socialHabitsTracker/graph"
 	resolvers "github.com/AntonioTrupac/socialHabitsTracker/graph/resolvers"
 	"github.com/AntonioTrupac/socialHabitsTracker/middleware"
@@ -22,14 +21,6 @@ import (
 
 const defaultPort = "8080"
 
-func init() {
-	defaultTranslation()
-}
-
-func defaultTranslation() {
-	directives.ValidateAddTranslation("email", "Email is not valid")
-}
-
 func graphqlHandler(db *gorm.DB) gin.HandlerFunc {
 	bookRepo := repository.NewBookService(db)
 	userRepo := repository.NewUserService(db)
@@ -38,8 +29,6 @@ func graphqlHandler(db *gorm.DB) gin.HandlerFunc {
 		BookRepository: bookRepo,
 		UserRepository: userRepo,
 	}}
-
-	c.Directives.Binding = directives.Binding
 
 	h := handler.NewDefaultServer(generated.NewExecutableSchema(c))
 
