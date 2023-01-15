@@ -89,7 +89,7 @@ func (u UserService) CreateUser(userInput *customTypes.UserInput) (*models.User,
 			return err
 		}
 
-		address := mapAddressInput(userInput.Address, user.ID)
+		address, _ := mapAddressInput(userInput.Address, user.ID)
 
 		if err := tx.Create(address).Error; err != nil {
 			fmt.Printf("Error creating address: %v", err)
@@ -177,10 +177,18 @@ func mapUserInputRoleToUserRole(role customTypes.Role) models.UserRole {
 	}
 }
 
-func mapAddressInput(addressInput []*customTypes.AddressInput, id uint) []*models.Address {
+func mapAddressInput(addressInput []*customTypes.AddressInput, id uint) ([]*models.Address, error) {
+	if addressInput == nil || len(addressInput) == 0 {
+		return nil, fmt.Errorf("addressInput is required")
+	}
+
 	var addresses []*models.Address
 
 	for _, address := range addressInput {
+		if address.Street == "" || address.City == "" || address.Country == "" {
+			return nil, fmt.Errorf("street, city and country fields in addressInput are required")
+		}
+
 		addresses = append(addresses, &models.Address{
 			Street:  address.Street,
 			City:    address.City,
@@ -189,5 +197,5 @@ func mapAddressInput(addressInput []*customTypes.AddressInput, id uint) []*model
 		})
 	}
 
-	return addresses
+	return addresses, nil
 }
