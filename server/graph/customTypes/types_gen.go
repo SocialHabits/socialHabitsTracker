@@ -35,6 +35,11 @@ type BookInput struct {
 	Publisher string `json:"publisher"`
 }
 
+type LoginInput struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
 type RoleInput struct {
 	Name Role `json:"name"`
 }

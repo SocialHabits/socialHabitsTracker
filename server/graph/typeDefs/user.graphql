@@ -42,6 +42,11 @@ input RoleInput {
     name: Role!
 }
 
+input LoginInput {
+    email: String!
+    password: String!
+}
+
 extend type Query {
     getUser(id: ID!): User!
     getUsers: [User!]!
@@ -52,5 +57,5 @@ extend type Mutation {
     createUser(input: UserInput!): User!
     updateUser(id: ID!, input: UserInput!): User!
     deleteUser(id: ID!): User!
-    login(email: String!, password: String!): Any!
+    login(input: LoginInput!): Any!
 }

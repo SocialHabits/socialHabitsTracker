@@ -13,12 +13,7 @@ import (
 	generated "github.com/AntonioTrupac/socialHabitsTracker/graph"
 	"github.com/AntonioTrupac/socialHabitsTracker/graph/customTypes"
 	"github.com/AntonioTrupac/socialHabitsTracker/middleware"
-	"github.com/AntonioTrupac/socialHabitsTracker/util"
 	"github.com/vektah/gqlparser/v2/gqlerror"
-)
-
-var (
-	ErrInput = errors.New("input errors")
 )
 
 // CreateUser is the resolver for the createUser field.
@@ -27,18 +22,6 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input customTypes.Use
 
 	if !isValid {
 		return nil, ErrInput
-	}
-
-	// check email
-	validEmail := util.CheckEmail(input.Email)
-
-	if !validEmail {
-		graphql.AddError(ctx, &gqlerror.Error{
-			Message: "Email is not valid",
-		})
-		return nil, &gqlerror.Error{
-			Message: "Invalid email",
-		}
 	}
 
 	// check if user email already exists
@@ -83,8 +66,14 @@ func (r *mutationResolver) DeleteUser(ctx context.Context, id int) (*customTypes
 }
 
 // Login is the resolver for the login field.
-func (r *mutationResolver) Login(ctx context.Context, email string, password string) (interface{}, error) {
-	return r.UserRepository.Login(ctx, email, password)
+func (r *mutationResolver) Login(ctx context.Context, input customTypes.LoginInput) (interface{}, error) {
+	isValid := validation(ctx, input)
+
+	if !isValid {
+		return nil, ErrInput
+	}
+
+	return r.UserRepository.Login(ctx, input.Email, input.Password)
 }
 
 // GetUser is the resolver for the getUser field.
@@ -184,3 +173,13 @@ func (r *queryResolver) GetRole(ctx context.Context, id int) (customTypes.Role, 
 
 	return roleGql, nil
 }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//   - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//     it when you're done.
+//   - You have helper methods in this file. Move them out to keep these resolver files clean.
+var (
+	ErrInput = errors.New("input errors")
+)

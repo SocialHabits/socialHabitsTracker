@@ -68,7 +68,7 @@ type ComplexityRoot struct {
 		DeleteBook func(childComplexity int, id int) int
 		DeleteTodo func(childComplexity int, todoID int) int
 		DeleteUser func(childComplexity int, id int) int
-		Login      func(childComplexity int, email string, password string) int
+		Login      func(childComplexity int, input customTypes.LoginInput) int
 		UpdateBook func(childComplexity int, id int, input customTypes.BookInput) int
 		UpdateTodo func(childComplexity int, input customTypes.TodoInput) int
 		UpdateUser func(childComplexity int, id int, input customTypes.UserInput) int
@@ -111,7 +111,7 @@ type MutationResolver interface {
 	CreateUser(ctx context.Context, input customTypes.UserInput) (*customTypes.User, error)
 	UpdateUser(ctx context.Context, id int, input customTypes.UserInput) (*customTypes.User, error)
 	DeleteUser(ctx context.Context, id int) (*customTypes.User, error)
-	Login(ctx context.Context, email string, password string) (interface{}, error)
+	Login(ctx context.Context, input customTypes.LoginInput) (interface{}, error)
 }
 type QueryResolver interface {
 	GetTodos(ctx context.Context) ([]*customTypes.Todo, error)
@@ -283,7 +283,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.Login(childComplexity, args["email"].(string), args["password"].(string)), true
+		return e.complexity.Mutation.Login(childComplexity, args["input"].(customTypes.LoginInput)), true
 
 	case "Mutation.UpdateBook":
 		if e.complexity.Mutation.UpdateBook == nil {
@@ -470,6 +470,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputAddressInput,
 		ec.unmarshalInputBookInput,
+		ec.unmarshalInputLoginInput,
 		ec.unmarshalInputRoleInput,
 		ec.unmarshalInputTodoInput,
 		ec.unmarshalInputUserInput,
@@ -687,24 +688,15 @@ func (ec *executionContext) field_Mutation_deleteUser_args(ctx context.Context, 
 func (ec *executionContext) field_Mutation_login_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["email"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+	var arg0 customTypes.LoginInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNLoginInput2githubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐLoginInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["email"] = arg0
-	var arg1 string
-	if tmp, ok := rawArgs["password"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
-		arg1, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["password"] = arg1
+	args["input"] = arg0
 	return args, nil
 }
 
@@ -1847,7 +1839,7 @@ func (ec *executionContext) _Mutation_login(ctx context.Context, field graphql.C
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().Login(rctx, fc.Args["email"].(string), fc.Args["password"].(string))
+		return ec.resolvers.Mutation().Login(rctx, fc.Args["input"].(customTypes.LoginInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4750,6 +4742,42 @@ func (ec *executionContext) unmarshalInputBookInput(ctx context.Context, obj int
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputLoginInput(ctx context.Context, obj interface{}) (customTypes.LoginInput, error) {
+	var it customTypes.LoginInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"email", "password"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "email":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
+			it.Email, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "password":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
+			it.Password, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputRoleInput(ctx context.Context, obj interface{}) (customTypes.RoleInput, error) {
 	var it customTypes.RoleInput
 	asMap := map[string]interface{}{}
@@ -5959,6 +5987,11 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNLoginInput2githubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐLoginInput(ctx context.Context, v interface{}) (customTypes.LoginInput, error) {
+	res, err := ec.unmarshalInputLoginInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalNRole2githubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐRole(ctx context.Context, v interface{}) (customTypes.Role, error) {
