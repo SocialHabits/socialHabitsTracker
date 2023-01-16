@@ -3,7 +3,6 @@ package middleware
 import (
 	"context"
 	"errors"
-	"fmt"
 	"github.com/AntonioTrupac/socialHabitsTracker/models"
 	"github.com/AntonioTrupac/socialHabitsTracker/util"
 	"github.com/gin-gonic/gin"
@@ -29,7 +28,7 @@ func (access *CookieAccess) SetToken(token string) {
 		Path:     "/",
 		Expires:  time.Now().Add(time.Hour * 24),
 		SameSite: http.SameSiteLaxMode,
-		MaxAge:   60 * 5,
+		MaxAge:   60 * 60 * 24,
 	})
 }
 
@@ -47,7 +46,6 @@ func extractUserIdAndRoleName(ctx *gin.Context) (*CookieContent, error) {
 	claims, token, err := util.ValidateIdToken(c.Value)
 
 	if err != nil || !token.Valid {
-		fmt.Println("WE HERE NOW 2")
 		ctx.JSON(401, gin.H{
 			"error": "invalid token",
 		})

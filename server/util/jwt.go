@@ -50,7 +50,7 @@ func GenerateAccessToken(userId int, email string, role models.UserRole) (string
 		Email:    email,
 		RoleName: role,
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Minute * 4)),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 24 * 30)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 		},
 	})

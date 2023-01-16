@@ -53,6 +53,11 @@ export type BookInput = {
   title: Scalars['String'];
 };
 
+export type LoginInput = {
+  email: Scalars['String'];
+  password: Scalars['String'];
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   CreateBook: Book;
@@ -105,8 +110,7 @@ export type MutationDeleteUserArgs = {
 
 
 export type MutationLoginArgs = {
-  email: Scalars['String'];
-  password: Scalars['String'];
+  input: LoginInput;
 };
 
 
@@ -196,8 +200,7 @@ export type UserInput = {
 };
 
 export type LoginVariables = Exact<{
-  email: Scalars['String'];
-  password: Scalars['String'];
+  input: LoginInput;
 }>;
 
 
@@ -217,8 +220,8 @@ export type GetUsers = { __typename?: 'Query', getUsers: Array<{ __typename?: 'U
 
 
 export const LoginDocument = /*#__PURE__*/ `
-    mutation Login($email: String!, $password: String!) {
-  login(email: $email, password: $password)
+    mutation Login($input: LoginInput!) {
+  login(input: $input)
 }
     `;
 export const useLogin = <

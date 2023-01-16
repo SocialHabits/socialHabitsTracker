@@ -34,8 +34,10 @@ const LoginForm = () => {
 
   const handleLogin: SubmitHandler<FormValuesSchema> = (data) => {
     mutate({
-      email: data.email,
-      password: data.password,
+      input: {
+        email: data.email,
+        password: data.password,
+      },
     });
 
     reset();
