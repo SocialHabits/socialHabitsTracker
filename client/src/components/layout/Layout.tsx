@@ -5,12 +5,12 @@ import * as React from 'react';
 export default function Layout({ children }: { children: React.ReactNode }) {
   // Put Header or Footer Here
   return (
-    <div className='flex'>
-      <aside className='flex h-screen flex-col rounded-tr-[30px] bg-primary-500 md:w-[200px]'>
-        <h1>Logo</h1>
-        <nav>
+    <div className='flex bg-primary-100'>
+      <aside className='flex h-screen flex-col rounded-tr-[30px] bg-gradient-to-r from-primary-400 to-primary-500 md:w-[200px]'>
+        <h1 className='py-4 px-6'>Logo</h1>
+        <nav className='mt-4'>
           <ul className='p-6'>
-            <li className='mb-2'>
+            <li className='mb-4'>
               <Link href='/dashboard'>
                 <span className='flex items-center'>
                   <Home className='mr-2' />
@@ -19,7 +19,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               </Link>
             </li>
 
-            <li className='mb-2'>
+            <li className='mb-4'>
               <Link href='/dashboard/allHabits'>
                 <span className='flex items-center'>
                   <AssignmentIndOutlined className='mr-2' />
@@ -28,7 +28,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               </Link>
             </li>
 
-            <li className='mb-2'>
+            <li className='mb-4'>
               <Link href='/dashboard/moods'>
                 <span className='flex items-center'>
                   <Mood className='mr-2' />
