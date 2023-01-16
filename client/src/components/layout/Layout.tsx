@@ -5,51 +5,55 @@ import * as React from 'react';
 export default function Layout({ children }: { children: React.ReactNode }) {
   // Put Header or Footer Here
   return (
-    <div className='flex bg-primary-100'>
-      <aside className='flex h-screen flex-col rounded-tr-[30px] bg-gradient-to-r from-primary-400 to-primary-500 md:w-[200px]'>
+    <div className='flex bg-primary-50'>
+      <aside className='flex h-screen flex-col rounded-tr-[60px] bg-gradient-to-r from-primary-100 to-primary-200 md:w-[250px]'>
         <h1 className='py-4 px-6'>Logo</h1>
         <nav className='mt-4'>
           <ul className='p-6'>
             <li className='mb-4'>
-              <Link href='/dashboard'>
-                <span className='flex items-center'>
-                  <Home className='mr-2' />
-                  <p>Home</p>
+              <Link href='/dashboard' className='group'>
+                <span className='flex items-center rounded px-4 py-2 group-hover:bg-primary-300'>
+                  <Home className='mr-2 fill-primary-900' />
+                  <p className='text-primary-900'>Home</p>
                 </span>
               </Link>
             </li>
 
             <li className='mb-4'>
-              <Link href='/dashboard/allHabits'>
-                <span className='flex items-center'>
-                  <AssignmentIndOutlined className='mr-2' />
-                  <p>Habits</p>
+              <Link href='/dashboard/allHabits' className='group'>
+                <span className='flex items-center rounded px-4 py-2 group-hover:bg-primary-300'>
+                  <AssignmentIndOutlined className='mr-2 fill-primary-900' />
+                  <p className='text-primary-900'>Habits</p>
                 </span>
               </Link>
             </li>
 
             <li className='mb-4'>
-              <Link href='/dashboard/moods'>
-                <span className='flex items-center'>
-                  <Mood className='mr-2' />
-                  <p>Moods</p>
+              <Link href='/dashboard/moods' className='group'>
+                <span className='flex items-center rounded px-4 py-2 group-hover:bg-primary-300'>
+                  <Mood className='mr-2 fill-primary-900' />
+                  <p className='text-primary-900'>Moods</p>
                 </span>
               </Link>
             </li>
 
             <li>
-              <Link href='/dashboard/conversations'>
-                <span className='flex items-center'>
-                  <Chat className='mr-2' />
-                  <p>Messages</p>
+              <Link href='/dashboard/conversations' className='group'>
+                <span className='flex items-center rounded px-4 py-2 group-hover:bg-primary-300'>
+                  <Chat className='mr-2 fill-primary-900' />
+                  <p className='text-primary-900'>Conversations</p>
                 </span>
               </Link>
             </li>
+
+            {/*  create underline component with tailwind*/}
+
+            {/*<hr className='my-4 border border-primary-500' />*/}
           </ul>
         </nav>
       </aside>
 
-      <div className='flex-grow pl-4'>
+      <div className='flex-grow pl-12'>
         <div className='flex h-16 w-full items-center justify-between'>
           <p className='flex'>
             <b className='mr-1'>Hello,</b> user name
