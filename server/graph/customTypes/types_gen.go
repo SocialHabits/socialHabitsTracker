@@ -2,6 +2,12 @@
 
 package customTypes
 
+import (
+	"fmt"
+	"io"
+	"strconv"
+)
+
 type Address struct {
 	ID      int    `json:"id"`
 	Street  string `json:"street"`
@@ -29,13 +35,13 @@ type BookInput struct {
 	Publisher string `json:"publisher"`
 }
 
-type Role struct {
-	ID   int    `json:"id"`
-	Name string `json:"name"`
+type LoginInput struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
 }
 
 type RoleInput struct {
-	Name string `json:"name"`
+	Name Role `json:"name"`
 }
 
 type Todo struct {
@@ -57,7 +63,7 @@ type User struct {
 	Email     string     `json:"email"`
 	Password  string     `json:"password"`
 	Address   []*Address `json:"address"`
-	Role      []*Role    `json:"role"`
+	Role      Role       `json:"role"`
 }
 
 type UserInput struct {
@@ -66,5 +72,50 @@ type UserInput struct {
 	Email     string          `json:"email"`
 	Password  string          `json:"password"`
 	Address   []*AddressInput `json:"address"`
-	Role      []*RoleInput    `json:"role"`
+	Role      Role            `json:"role"`
+}
+
+type Role string
+
+const (
+	RoleAdmin   Role = "ADMIN"
+	RoleRegular Role = "REGULAR"
+	RolePremium Role = "PREMIUM"
+	RoleTrainer Role = "TRAINER"
+)
+
+var AllRole = []Role{
+	RoleAdmin,
+	RoleRegular,
+	RolePremium,
+	RoleTrainer,
+}
+
+func (e Role) IsValid() bool {
+	switch e {
+	case RoleAdmin, RoleRegular, RolePremium, RoleTrainer:
+		return true
+	}
+	return false
+}
+
+func (e Role) String() string {
+	return string(e)
+}
+
+func (e *Role) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = Role(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid Role", str)
+	}
+	return nil
+}
+
+func (e Role) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
 }

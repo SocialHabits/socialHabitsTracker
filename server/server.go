@@ -7,8 +7,10 @@ import (
 	"github.com/AntonioTrupac/socialHabitsTracker/middleware"
 	"github.com/AntonioTrupac/socialHabitsTracker/models"
 	"github.com/AntonioTrupac/socialHabitsTracker/repository"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+
 	"gorm.io/gorm"
 
 	"os"
@@ -23,10 +25,12 @@ func graphqlHandler(db *gorm.DB) gin.HandlerFunc {
 	bookRepo := repository.NewBookService(db)
 	userRepo := repository.NewUserService(db)
 
-	h := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &resolvers.Resolver{
+	c := generated.Config{Resolvers: &resolvers.Resolver{
 		BookRepository: bookRepo,
 		UserRepository: userRepo,
-	}}))
+	}}
+
+	h := handler.NewDefaultServer(generated.NewExecutableSchema(c))
 
 	return func(c *gin.Context) {
 		h.ServeHTTP(c.Writer, c.Request)
@@ -50,13 +54,20 @@ func main() {
 		panic(err)
 	}
 
-	db.AutoMigrate(&models.Book{}, &models.User{}, &models.Address{}, &models.Role{}, &models.UserRoles{})
+	db.AutoMigrate(&models.Book{}, &models.User{}, &models.Address{})
 
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = defaultPort
 	}
 	r := gin.Default()
+	r.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"http://localhost:3000"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "PATCH"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization", "Set-Cookie"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+	}))
 
 	r.Use(middleware.AuthMiddleware())
 	r.POST("/query", graphqlHandler(db))

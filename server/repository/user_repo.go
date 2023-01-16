@@ -17,9 +17,7 @@ type UserRepository interface {
 	GetUserById(id int) (*models.User, error)
 	GetUsers() ([]*models.User, error)
 	CreateUser(userInput *customTypes.UserInput) (*models.User, error)
-	GetRoles() ([]*models.Role, error)
-	GetRoleByName(name string) (*models.Role, error)
-	CreateRole(roleInput *customTypes.RoleInput) (*models.Role, error)
+	GetRoleByUserID(id int) (models.UserRole, error)
 	Login(ctx context.Context, email, password string) (interface{}, error)
 	CheckUserEmail(email string) (bool, error)
 	// UpdateUser(userInput *customTypes.UserInput, id int) error
@@ -52,7 +50,7 @@ func (u UserService) GetUserById(id int) (*models.User, error) {
 func (u UserService) GetUsers() ([]*models.User, error) {
 	var users []*models.User
 
-	err := u.Db.Model(&models.User{}).Preload("Address").Preload("Roles").Find(&users).Error
+	err := u.Db.Model(&models.User{}).Preload("Address").Find(&users).Error
 
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		fmt.Printf("No users found")
@@ -61,47 +59,27 @@ func (u UserService) GetUsers() ([]*models.User, error) {
 	return users, err
 }
 
-func mapAddressInput(addressInput []*customTypes.AddressInput, id uint) []*models.Address {
-	var addresses []*models.Address
-
-	for _, address := range addressInput {
-		addresses = append(addresses, &models.Address{
-			Street:  address.Street,
-			City:    address.City,
-			Country: address.Country,
-			UserID:  id,
-		})
-	}
-
-	return addresses
-}
-
 // CheckUserEmail check if user email already exists
 func (u UserService) CheckUserEmail(email string) (bool, error) {
-	var user models.User
+	var user *models.User
 
 	err := u.Db.Model(&models.User{}).Where("email = ?", email).First(&user).Error
 
 	if errors.Is(err, gorm.ErrRecordNotFound) {
+		fmt.Errorf("user with email %s not found", email)
 		return false, err
 	}
 
 	return true, nil
 }
 
-type Result struct {
-	ID   uint
-	Name string
-}
-
 func (u UserService) CreateUser(userInput *customTypes.UserInput) (*models.User, error) {
-	var userRoles []*models.UserRoles
-
 	user := &models.User{
 		FirstName: userInput.FirstName,
 		LastName:  userInput.LastName,
 		Email:     userInput.Email,
 		Password:  userInput.Password,
+		Role:      mapUserInputRoleToUserRole(userInput.Role),
 	}
 
 	err := u.Db.Transaction(func(tx *gorm.DB) error {
@@ -111,9 +89,9 @@ func (u UserService) CreateUser(userInput *customTypes.UserInput) (*models.User,
 			return err
 		}
 
-		address := mapAddressInput(userInput.Address, user.ID)
+		address, _ := mapAddressInput(userInput.Address, user.ID)
 
-		if err := tx.Create(&address).Error; err != nil {
+		if err := tx.Create(address).Error; err != nil {
 			fmt.Printf("Error creating address: %v", err)
 			return err
 		}
@@ -122,85 +100,39 @@ func (u UserService) CreateUser(userInput *customTypes.UserInput) (*models.User,
 			value.UserID = user.ID
 		}
 
-		// add address values to user model (for returning)
 		user.Address = address
-
-		for _, role := range userInput.Role {
-			role, err := u.GetRoleByName(role.Name)
-
-			if err != nil {
-				return err
-			}
-
-			userRoles = append(userRoles, &models.UserRoles{
-				UserID: user.ID,
-				RoleID: role.ID,
-			})
-
-			user.Roles = append(user.Roles, role)
-		}
-
-		if err := tx.Create(&userRoles).Error; err != nil {
-			fmt.Printf("Error creating user roles: %v", err)
-			return err
-		}
 
 		return nil
 	})
 
 	if err != nil {
+		fmt.Printf("Error creating user: %v", err)
 		return nil, err
 	}
 
 	return user, nil
 }
 
-func (u UserService) GetRoles() ([]*models.Role, error) {
-	var roles []*models.Role
+func (u UserService) GetRoleByUserID(id int) (models.UserRole, error) {
+	var user *models.User
 
-	err := u.Db.Model(&models.Role{}).Find(&roles).Error
-
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		fmt.Printf("No roles found")
-	}
-
-	return roles, err
-}
-
-func (u UserService) GetRoleByName(name string) (*models.Role, error) {
-	var role models.Role
-
-	err := u.Db.Model(&models.Role{}).Select("id, name").Where("name = ?", name).Find(&role).Error
+	err := u.Db.Where("id = ?", id).Take(&user).Error
 
 	if errors.Is(err, gorm.ErrRecordNotFound) {
-		fmt.Printf("Role with name %s not found", name)
+		fmt.Printf("User and role with id: %d not found", id)
 	}
 
-	return &role, err
-}
-
-func (u UserService) CreateRole(roleInput *customTypes.RoleInput) (*models.Role, error) {
-	role := &models.Role{
-		Name: roleInput.Name,
-	}
-
-	err := u.Db.Create(role).Error
-
-	if err != nil {
-		return nil, err
-	}
-
-	return role, nil
+	return user.Role, err
 }
 
 func (u UserService) Login(ctx context.Context, email, password string) (interface{}, error) {
 	var user *models.User
 
-	if err := u.Db.Model(&user).Preload("Address").Preload("Roles").Where("email LIKE ?", email).Take(&user).Error; err != nil {
+	if err := u.Db.Model(&user).Preload("Address").Where("email LIKE ?", email).Take(&user).Error; err != nil {
 		// if user not found
 		if err == gorm.ErrRecordNotFound {
 			return nil, &gqlerror.Error{
-				Message: "User with this email not found",
+				Message: "User with this email does not	exist",
 			}
 		}
 
@@ -214,17 +146,56 @@ func (u UserService) Login(ctx context.Context, email, password string) (interfa
 		}
 	}
 
-	accessToken, err := util.GenerateAccessToken(int(user.ID), user.Email, user.Roles[0].Name)
+	accessToken, err := util.GenerateAccessToken(int(user.ID), user.Email, user.Role)
 	if err != nil {
+		fmt.Printf("Error generating access token: %v", err)
 		return nil, err
 	}
 
-	CA := middleware.GetCookieAccess(ctx)
-	CA.SetToken(accessToken)
-	CA.UserId = uint64(user.ID)
-	CA.RoleName = user.Roles[0].Name
+	cookieAccess := middleware.GetCookieAccess(ctx)
+	cookieAccess.SetToken(accessToken)
+	cookieAccess.UserId = uint64(user.ID)
+	cookieAccess.RoleName = user.Role
 
 	return map[string]interface{}{
-		"accessToken": accessToken,
+		"success": "token has been set",
 	}, nil
+}
+
+func mapUserInputRoleToUserRole(role customTypes.Role) models.UserRole {
+	switch role {
+	case customTypes.RoleAdmin:
+		return models.Admin
+	case customTypes.RoleRegular:
+		return models.Regular
+	case customTypes.RoleTrainer:
+		return models.Trainer
+	case customTypes.RolePremium:
+		return models.Premium
+	default:
+		return models.Regular
+	}
+}
+
+func mapAddressInput(addressInput []*customTypes.AddressInput, id uint) ([]*models.Address, error) {
+	if addressInput == nil || len(addressInput) == 0 {
+		return nil, fmt.Errorf("addressInput is required")
+	}
+
+	var addresses []*models.Address
+
+	for _, address := range addressInput {
+		if address.Street == "" || address.City == "" || address.Country == "" {
+			return nil, fmt.Errorf("street, city and country fields in addressInput are required")
+		}
+
+		addresses = append(addresses, &models.Address{
+			Street:  address.Street,
+			City:    address.City,
+			Country: address.Country,
+			UserID:  id,
+		})
+	}
+
+	return addresses, nil
 }

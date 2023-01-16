@@ -2,6 +2,7 @@ package util
 
 import (
 	"fmt"
+	"github.com/AntonioTrupac/socialHabitsTracker/models"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/google/uuid"
 	"os"
@@ -9,15 +10,16 @@ import (
 )
 
 type Claims struct {
-	UserID   int    `json:"userId"`
-	TokenID  string `json:"tokenId"`
-	Email    string `json:"email"`
-	RoleName string `json:"roleName"`
+	UserID   int             `json:"userId"`
+	TokenID  string          `json:"tokenId"`
+	Email    string          `json:"email"`
+	RoleName models.UserRole `json:"roleName"`
 	jwt.RegisteredClaims
 }
 
 var accessTokenSecret = []byte(getAccessTokenSecret())
-var refreshTokenSecret = []byte(getRefreshTokenSecret())
+
+//var refreshTokenSecret = []byte(getRefreshTokenSecret())
 
 func getAccessTokenSecret() string {
 	secret := os.Getenv("ACCESS_SECRET")
@@ -39,7 +41,7 @@ func getRefreshTokenSecret() string {
 	return secret
 }
 
-func GenerateAccessToken(userId int, email string, role string) (string, error) {
+func GenerateAccessToken(userId int, email string, role models.UserRole) (string, error) {
 	tokenId := uuid.New().String()
 
 	tokenClaims := jwt.NewWithClaims(jwt.SigningMethodHS256, &Claims{
@@ -48,7 +50,7 @@ func GenerateAccessToken(userId int, email string, role string) (string, error) 
 		Email:    email,
 		RoleName: role,
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Minute * 15)),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Minute * 4)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 		},
 	})
@@ -62,7 +64,7 @@ func GenerateAccessToken(userId int, email string, role string) (string, error) 
 	return token, nil
 }
 
-func ValidateIdToken(tokenString string) (*Claims, error) {
+func ValidateIdToken(tokenString string) (*Claims, *jwt.Token, error) {
 	token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("there has been a problem with the signing method")
@@ -72,13 +74,13 @@ func ValidateIdToken(tokenString string) (*Claims, error) {
 	})
 
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	claims, ok := token.Claims.(*Claims)
 	if !ok {
-		return nil, fmt.Errorf("there has been a problem with the claims")
+		return nil, nil, fmt.Errorf("there has been a problem with the claims")
 	}
 
-	return claims, nil
+	return claims, token, nil
 }

@@ -1,10 +1,9 @@
-import * as React from 'react';
-
 import clsxm from '@/lib/clsxm';
 
 import UnstyledLink, {
   UnstyledLinkProps,
 } from '@/components/links/UnstyledLink';
+import { forwardRef } from 'react';
 
 enum ButtonVariant {
   'primary',
@@ -19,7 +18,7 @@ type ButtonLinkProps = {
   variant?: keyof typeof ButtonVariant;
 } & UnstyledLinkProps;
 
-const ButtonLink = React.forwardRef<HTMLAnchorElement, ButtonLinkProps>(
+const ButtonLink = forwardRef<HTMLAnchorElement, ButtonLinkProps>(
   (
     { children, className, variant = 'primary', isDarkBg = false, ...rest },
     ref

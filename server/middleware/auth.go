@@ -3,6 +3,8 @@ package middleware
 import (
 	"context"
 	"errors"
+	"fmt"
+	"github.com/AntonioTrupac/socialHabitsTracker/models"
 	"github.com/AntonioTrupac/socialHabitsTracker/util"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -14,7 +16,7 @@ const cookieAccessKeyCtx = "cookieAccess"
 type CookieAccess struct {
 	Writer     http.ResponseWriter
 	UserId     uint64
-	RoleName   string
+	RoleName   models.UserRole
 	IsLoggedIn bool
 }
 
@@ -26,26 +28,37 @@ func (access *CookieAccess) SetToken(token string) {
 		HttpOnly: true,
 		Path:     "/",
 		Expires:  time.Now().Add(time.Hour * 24),
+		SameSite: http.SameSiteLaxMode,
+		MaxAge:   60 * 5,
 	})
 }
 
 type CookieContent struct {
 	UserId   int
-	RoleName string
+	RoleName models.UserRole
 }
 
 func extractUserIdAndRoleName(ctx *gin.Context) (*CookieContent, error) {
 	c, err := ctx.Request.Cookie("jwt")
-	if err != nil {
-		return nil, errors.New("There is no token in cookies")
+	if err != nil || c.Value == "" {
+		return nil, errors.New("there is no token in cookies")
 	}
 
-	claims, err := util.ValidateIdToken(c.Value)
-	if err != nil {
-		return nil, err
+	claims, token, err := util.ValidateIdToken(c.Value)
+
+	if err != nil || !token.Valid {
+		fmt.Println("WE HERE NOW 2")
+		ctx.JSON(401, gin.H{
+			"error": "invalid token",
+		})
+		ctx.Abort()
+
+		return nil, ctx.AbortWithError(401, gin.Error{
+			Err: errors.New("invalid token"),
+		})
 	}
 
-	return &CookieContent{UserId: claims.UserID, RoleName: claims.RoleName}, nil
+	return &CookieContent{UserId: claims.UserID, RoleName: claims.RoleName}, err
 }
 
 func setValInCtx(ctx *gin.Context, val interface{}) {
@@ -55,7 +68,6 @@ func setValInCtx(ctx *gin.Context, val interface{}) {
 
 func GetValFromCtx(ctx context.Context) *CookieAccess {
 	raw := ctx.Value(cookieAccessKeyCtx).(*CookieAccess)
-
 	return raw
 }
 
@@ -80,6 +92,7 @@ func AuthMiddleware() gin.HandlerFunc {
 		cookieA.UserId = uint64(user.UserId)
 		cookieA.IsLoggedIn = true
 		cookieA.RoleName = user.RoleName
+		//ctx.Set("user", user)
 
 		// calling the actual resolver
 		ctx.Next()
