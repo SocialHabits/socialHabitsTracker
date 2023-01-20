@@ -1,0 +1,45 @@
+enum MoodType {
+    IRRITATED,
+    TENSE,
+    EXCITED,
+    CALM,
+    HAPPY,
+    SAD,
+    ANGRY,
+    FEARFUL,
+    DISGUSTED,
+    SURPRISED,
+    ANXIOUS
+    NEGATIVE,
+    RELAXED,
+}
+
+enum MoodIntensity {
+    LOW,
+    MEDIUM,
+    HIGH
+}
+
+type Mood {
+    id: ID!
+    note: String
+    types: [MoodType!]!
+    intensity: [MoodIntensity!]!
+}
+
+extend type Query {
+    getMoods: [Mood!]!
+    getMood(id: ID!): Mood!
+}
+
+input MoodInput {
+    note: String
+    types: [MoodType!]!
+    intensity: [MoodIntensity!]!
+}
+
+extend type Mutation {
+    createMood(input: MoodInput!): Mood!
+    updateMood(id: ID!, input: MoodInput): Mood!
+    deleteMood(id: ID!): Boolean!
+}
