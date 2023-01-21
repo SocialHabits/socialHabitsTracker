@@ -21,7 +21,7 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input customTypes.Use
 	isValid := validation(ctx, input)
 
 	if !isValid {
-		return nil, ErrInput
+		return nil, errors.New("input errors")
 	}
 
 	// check if user email already exists
@@ -70,7 +70,7 @@ func (r *mutationResolver) Login(ctx context.Context, input customTypes.LoginInp
 	isValid := validation(ctx, input)
 
 	if !isValid {
-		return nil, ErrInput
+		return nil, errors.New("input errors")
 	}
 
 	return r.UserRepository.Login(ctx, input.Email, input.Password)
@@ -171,13 +171,3 @@ func (r *queryResolver) GetRole(ctx context.Context, id int) (customTypes.Role, 
 
 	return roleGql, nil
 }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//   - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//     it when you're done.
-//   - You have helper methods in this file. Move them out to keep these resolver files clean.
-var (
-	ErrInput = errors.New("input errors")
-)

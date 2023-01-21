@@ -38,3 +38,38 @@ func ConvertModelRoleToEnum(roleName models.UserRole) customTypes.Role {
 
 	return role
 }
+
+func ConvertMoodTypeToEnum(moodType models.MoodType) customTypes.MoodType {
+	var mood customTypes.MoodType
+
+	switch moodType {
+	case models.Happy:
+		mood = customTypes.MoodTypeHappy
+	case models.Sad:
+		mood = customTypes.MoodTypeSad
+	case models.Irritated:
+		mood = customTypes.MoodTypeIrritated
+	case models.Angry:
+		mood = customTypes.MoodTypeAngry
+	case models.Surprised:
+		mood = customTypes.MoodTypeSurprised
+	case models.Negative:
+		mood = customTypes.MoodTypeNegative
+	case models.Fearful:
+		mood = customTypes.MoodTypeFearful
+	case models.Anxious:
+		mood = customTypes.MoodTypeAnxious
+	case models.Calm:
+		mood = customTypes.MoodTypeCalm
+	case models.Excited:
+		mood = customTypes.MoodTypeExcited
+	case models.Disgusted:
+		mood = customTypes.MoodTypeDisgusted
+	case models.Relaxed:
+		mood = customTypes.MoodTypeRelaxed
+	case models.Tense:
+		mood = customTypes.MoodTypeTense
+	}
+
+	return mood
+}

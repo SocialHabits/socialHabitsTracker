@@ -68,3 +68,7 @@ type Mood struct {
 	Type      MoodType      `gorm:"type:enum('NEGATIVE', 'IRRITATED', 'TENSE', 'ANXIOUS', 'EXCITED', 'CALM', 'HAPPY', 'RELAXED', 'SURPRISED', 'SAD', 'ANGRY', 'DISGUSTED', 'FEARFUL')";"column:type" json:"type"`
 	Intensity MoodIntensity `gorm:"type:enum('HIGH', 'MEDIUM', 'LOW')";"column:intensity" json:"intensity"`
 }
+
+func (Mood) TableName() string {
+	return "moods"
+}

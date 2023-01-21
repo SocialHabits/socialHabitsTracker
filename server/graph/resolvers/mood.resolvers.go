@@ -7,13 +7,29 @@ package graph
 import (
 	"context"
 	"fmt"
+	generated "github.com/AntonioTrupac/socialHabitsTracker/graph"
+	"github.com/vektah/gqlparser/v2/gqlerror"
 
 	"github.com/AntonioTrupac/socialHabitsTracker/graph/customTypes"
 )
 
 // CreateMood is the resolver for the createMood field.
 func (r *mutationResolver) CreateMood(ctx context.Context, input customTypes.MoodInput) (*customTypes.Mood, error) {
-	panic(fmt.Errorf("not implemented: CreateMood - createMood"))
+	repoMood, err := r.MoodRepository.CreateMood(input)
+
+	if err != nil {
+		return nil, &gqlerror.Error{
+			Message: "Could not create mood",
+		}
+	}
+
+	mood := &customTypes.Mood{
+		ID:    int(repoMood.ID),
+		Note:  &repoMood.Note,
+		Types: generated.ConvertMoodTypeToEnum(repoMood.Type),
+	}
+
+	return mood, nil
 }
 
 // UpdateMood is the resolver for the updateMood field.
