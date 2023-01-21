@@ -24,10 +24,12 @@ const defaultPort = "8080"
 func graphqlHandler(db *gorm.DB) gin.HandlerFunc {
 	bookRepo := repository.NewBookService(db)
 	userRepo := repository.NewUserService(db)
+	moodRepo := repository.NewMoodService(db)
 
 	c := generated.Config{Resolvers: &resolvers.Resolver{
 		BookRepository: bookRepo,
 		UserRepository: userRepo,
+		MoodRepository: moodRepo,
 	}}
 
 	h := handler.NewDefaultServer(generated.NewExecutableSchema(c))
@@ -54,7 +56,7 @@ func main() {
 		panic(err)
 	}
 
-	db.AutoMigrate(&models.Book{}, &models.User{}, &models.Address{})
+	db.AutoMigrate(&models.Book{}, &models.User{}, &models.Address{}, &models.Mood{})
 
 	port := os.Getenv("PORT")
 	if port == "" {

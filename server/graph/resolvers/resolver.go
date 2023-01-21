@@ -9,4 +9,5 @@ import "github.com/AntonioTrupac/socialHabitsTracker/repository"
 type Resolver struct {
 	BookRepository repository.BookRepository
 	UserRepository repository.UserRepository
+	MoodRepository repository.MoodRepository
 }
