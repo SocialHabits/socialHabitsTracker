@@ -38,7 +38,7 @@ func NewUserService(db *gorm.DB) *UserService {
 func (u UserService) GetUserById(id int) (*models.User, error) {
 	var user models.User
 
-	err := u.Db.Model(&models.User{}).Preload("Address").Where("id = ?", id).First(&user).Error
+	err := u.Db.Model(&models.User{}).Where("id = ?", id).First(&user).Error
 
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		fmt.Printf("User with id %d not found", id)

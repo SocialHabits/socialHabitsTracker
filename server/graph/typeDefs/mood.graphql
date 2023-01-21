@@ -23,19 +23,19 @@ enum MoodIntensity {
 type Mood {
     id: ID!
     note: String
-    types: [MoodType!]!
-    intensity: [MoodIntensity!]!
-}
-
-extend type Query {
-    getMoods: [Mood!]!
-    getMood(id: ID!): Mood!
+    types: MoodType!
+    intensity: MoodIntensity!
 }
 
 input MoodInput {
     note: String
-    types: [MoodType!]!
-    intensity: [MoodIntensity!]!
+    types: MoodType!
+    intensity: MoodIntensity!
+}
+
+extend type Query {
+    getMoods: Mood!
+    getMood(id: ID!): Mood!
 }
 
 extend type Mutation {

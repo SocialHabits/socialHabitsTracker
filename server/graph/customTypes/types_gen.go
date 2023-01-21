@@ -35,22 +35,30 @@ type BookInput struct {
 	Publisher string `json:"publisher"`
 }
 
+type CurrentUser struct {
+	ID        int     `json:"id"`
+	FirstName string  `json:"firstName"`
+	LastName  string  `json:"lastName"`
+	Role      Role    `json:"role"`
+	Mood      []*Mood `json:"mood"`
+}
+
 type LoginInput struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
 }
 
 type Mood struct {
-	ID        int             `json:"id"`
-	Note      *string         `json:"note"`
-	Types     []MoodType      `json:"types"`
-	Intensity []MoodIntensity `json:"intensity"`
+	ID        int           `json:"id"`
+	Note      *string       `json:"note"`
+	Types     MoodType      `json:"types"`
+	Intensity MoodIntensity `json:"intensity"`
 }
 
 type MoodInput struct {
-	Note      *string         `json:"note"`
-	Types     []MoodType      `json:"types"`
-	Intensity []MoodIntensity `json:"intensity"`
+	Note      *string       `json:"note"`
+	Types     MoodType      `json:"types"`
+	Intensity MoodIntensity `json:"intensity"`
 }
 
 type RoleInput struct {
@@ -144,6 +152,9 @@ const (
 	MoodTypeFearful   MoodType = "FEARFUL"
 	MoodTypeDisgusted MoodType = "DISGUSTED"
 	MoodTypeSurprised MoodType = "SURPRISED"
+	MoodTypeAnxious   MoodType = "ANXIOUS"
+	MoodTypeNegative  MoodType = "NEGATIVE"
+	MoodTypeRelaxed   MoodType = "RELAXED"
 )
 
 var AllMoodType = []MoodType{
@@ -157,11 +168,14 @@ var AllMoodType = []MoodType{
 	MoodTypeFearful,
 	MoodTypeDisgusted,
 	MoodTypeSurprised,
+	MoodTypeAnxious,
+	MoodTypeNegative,
+	MoodTypeRelaxed,
 }
 
 func (e MoodType) IsValid() bool {
 	switch e {
-	case MoodTypeIrritated, MoodTypeTense, MoodTypeExcited, MoodTypeCalm, MoodTypeHappy, MoodTypeSad, MoodTypeAngry, MoodTypeFearful, MoodTypeDisgusted, MoodTypeSurprised:
+	case MoodTypeIrritated, MoodTypeTense, MoodTypeExcited, MoodTypeCalm, MoodTypeHappy, MoodTypeSad, MoodTypeAngry, MoodTypeFearful, MoodTypeDisgusted, MoodTypeSurprised, MoodTypeAnxious, MoodTypeNegative, MoodTypeRelaxed:
 		return true
 	}
 	return false

@@ -77,7 +77,7 @@ func (r *mutationResolver) Login(ctx context.Context, input customTypes.LoginInp
 }
 
 // GetUser is the resolver for the getUser field.
-func (r *queryResolver) GetUser(ctx context.Context, id int) (*customTypes.User, error) {
+func (r *queryResolver) GetUser(ctx context.Context, id int) (*customTypes.CurrentUser, error) {
 	userClaims := middleware.GetValFromCtx(ctx)
 
 	if userClaims == nil || userClaims.UserId <= 0 && userClaims.IsLoggedIn == false && userClaims.RoleName != "REGULAR" {
@@ -88,13 +88,11 @@ func (r *queryResolver) GetUser(ctx context.Context, id int) (*customTypes.User,
 
 	user, err := r.UserRepository.GetUserById(id)
 
-	userGql := &customTypes.User{
+	userGql := &customTypes.CurrentUser{
 		FirstName: user.FirstName,
 		LastName:  user.LastName,
-		Email:     user.Email,
 		Role:      generated.ConvertModelRoleToEnum(user.Role),
 		ID:        int(user.ID),
-		Address:   generated.MapAddressModelToGqlType(user.Address),
 	}
 
 	if err != nil {

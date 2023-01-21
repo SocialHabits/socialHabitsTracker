@@ -61,6 +61,14 @@ type ComplexityRoot struct {
 		Title     func(childComplexity int) int
 	}
 
+	CurrentUser struct {
+		FirstName func(childComplexity int) int
+		ID        func(childComplexity int) int
+		LastName  func(childComplexity int) int
+		Mood      func(childComplexity int) int
+		Role      func(childComplexity int) int
+	}
+
 	Mood struct {
 		ID        func(childComplexity int) int
 		Intensity func(childComplexity int) int
@@ -133,9 +141,9 @@ type QueryResolver interface {
 	GetTodo(ctx context.Context, todoID int) (*customTypes.Todo, error)
 	GetAllBooks(ctx context.Context) ([]*customTypes.Book, error)
 	GetOneBook(ctx context.Context, id int) (*customTypes.Book, error)
-	GetMoods(ctx context.Context) ([]*customTypes.Mood, error)
+	GetMoods(ctx context.Context) (*customTypes.Mood, error)
 	GetMood(ctx context.Context, id int) (*customTypes.Mood, error)
-	GetUser(ctx context.Context, id int) (*customTypes.User, error)
+	GetUser(ctx context.Context, id int) (*customTypes.CurrentUser, error)
 	GetUsers(ctx context.Context) ([]*customTypes.User, error)
 	GetRole(ctx context.Context, id int) (customTypes.Role, error)
 }
@@ -217,6 +225,41 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Book.Title(childComplexity), true
+
+	case "CurrentUser.firstName":
+		if e.complexity.CurrentUser.FirstName == nil {
+			break
+		}
+
+		return e.complexity.CurrentUser.FirstName(childComplexity), true
+
+	case "CurrentUser.id":
+		if e.complexity.CurrentUser.ID == nil {
+			break
+		}
+
+		return e.complexity.CurrentUser.ID(childComplexity), true
+
+	case "CurrentUser.lastName":
+		if e.complexity.CurrentUser.LastName == nil {
+			break
+		}
+
+		return e.complexity.CurrentUser.LastName(childComplexity), true
+
+	case "CurrentUser.mood":
+		if e.complexity.CurrentUser.Mood == nil {
+			break
+		}
+
+		return e.complexity.CurrentUser.Mood(childComplexity), true
+
+	case "CurrentUser.role":
+		if e.complexity.CurrentUser.Role == nil {
+			break
+		}
+
+		return e.complexity.CurrentUser.Role(childComplexity), true
 
 	case "Mood.id":
 		if e.complexity.Mood.ID == nil {
@@ -1419,6 +1462,233 @@ func (ec *executionContext) fieldContext_Book_publisher(ctx context.Context, fie
 	return fc, nil
 }
 
+func (ec *executionContext) _CurrentUser_id(ctx context.Context, field graphql.CollectedField, obj *customTypes.CurrentUser) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CurrentUser_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNID2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CurrentUser_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CurrentUser",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CurrentUser_firstName(ctx context.Context, field graphql.CollectedField, obj *customTypes.CurrentUser) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CurrentUser_firstName(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.FirstName, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CurrentUser_firstName(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CurrentUser",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CurrentUser_lastName(ctx context.Context, field graphql.CollectedField, obj *customTypes.CurrentUser) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CurrentUser_lastName(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.LastName, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CurrentUser_lastName(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CurrentUser",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CurrentUser_role(ctx context.Context, field graphql.CollectedField, obj *customTypes.CurrentUser) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CurrentUser_role(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Role, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(customTypes.Role)
+	fc.Result = res
+	return ec.marshalNRole2githubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐRole(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CurrentUser_role(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CurrentUser",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Role does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CurrentUser_mood(ctx context.Context, field graphql.CollectedField, obj *customTypes.CurrentUser) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CurrentUser_mood(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Mood, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*customTypes.Mood)
+	fc.Result = res
+	return ec.marshalOMood2ᚕᚖgithubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐMood(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CurrentUser_mood(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CurrentUser",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Mood_id(ctx, field)
+			case "note":
+				return ec.fieldContext_Mood_note(ctx, field)
+			case "types":
+				return ec.fieldContext_Mood_types(ctx, field)
+			case "intensity":
+				return ec.fieldContext_Mood_intensity(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Mood", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Mood_id(ctx context.Context, field graphql.CollectedField, obj *customTypes.Mood) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mood_id(ctx, field)
 	if err != nil {
@@ -1530,9 +1800,9 @@ func (ec *executionContext) _Mood_types(ctx context.Context, field graphql.Colle
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]customTypes.MoodType)
+	res := resTmp.(customTypes.MoodType)
 	fc.Result = res
-	return ec.marshalNMoodType2ᚕgithubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐMoodTypeᚄ(ctx, field.Selections, res)
+	return ec.marshalNMoodType2githubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐMoodType(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mood_types(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1574,9 +1844,9 @@ func (ec *executionContext) _Mood_intensity(ctx context.Context, field graphql.C
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]customTypes.MoodIntensity)
+	res := resTmp.(customTypes.MoodIntensity)
 	fc.Result = res
-	return ec.marshalNMoodIntensity2ᚕgithubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐMoodIntensityᚄ(ctx, field.Selections, res)
+	return ec.marshalNMoodIntensity2githubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐMoodIntensity(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mood_intensity(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2669,9 +2939,9 @@ func (ec *executionContext) _Query_getMoods(ctx context.Context, field graphql.C
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*customTypes.Mood)
+	res := resTmp.(*customTypes.Mood)
 	fc.Result = res
-	return ec.marshalNMood2ᚕᚖgithubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐMoodᚄ(ctx, field.Selections, res)
+	return ec.marshalNMood2ᚖgithubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐMood(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_getMoods(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2788,9 +3058,9 @@ func (ec *executionContext) _Query_getUser(ctx context.Context, field graphql.Co
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*customTypes.User)
+	res := resTmp.(*customTypes.CurrentUser)
 	fc.Result = res
-	return ec.marshalNUser2ᚖgithubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐUser(ctx, field.Selections, res)
+	return ec.marshalNCurrentUser2ᚖgithubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐCurrentUser(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_getUser(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2802,21 +3072,17 @@ func (ec *executionContext) fieldContext_Query_getUser(ctx context.Context, fiel
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
-				return ec.fieldContext_User_id(ctx, field)
+				return ec.fieldContext_CurrentUser_id(ctx, field)
 			case "firstName":
-				return ec.fieldContext_User_firstName(ctx, field)
+				return ec.fieldContext_CurrentUser_firstName(ctx, field)
 			case "lastName":
-				return ec.fieldContext_User_lastName(ctx, field)
-			case "email":
-				return ec.fieldContext_User_email(ctx, field)
-			case "password":
-				return ec.fieldContext_User_password(ctx, field)
-			case "address":
-				return ec.fieldContext_User_address(ctx, field)
+				return ec.fieldContext_CurrentUser_lastName(ctx, field)
 			case "role":
-				return ec.fieldContext_User_role(ctx, field)
+				return ec.fieldContext_CurrentUser_role(ctx, field)
+			case "mood":
+				return ec.fieldContext_CurrentUser_mood(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type CurrentUser", field.Name)
 		},
 	}
 	defer func() {
@@ -5452,7 +5718,7 @@ func (ec *executionContext) unmarshalInputMoodInput(ctx context.Context, obj int
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("types"))
-			it.Types, err = ec.unmarshalNMoodType2ᚕgithubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐMoodTypeᚄ(ctx, v)
+			it.Types, err = ec.unmarshalNMoodType2githubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐMoodType(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -5460,7 +5726,7 @@ func (ec *executionContext) unmarshalInputMoodInput(ctx context.Context, obj int
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("intensity"))
-			it.Intensity, err = ec.unmarshalNMoodIntensity2ᚕgithubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐMoodIntensityᚄ(ctx, v)
+			it.Intensity, err = ec.unmarshalNMoodIntensity2githubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐMoodIntensity(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -5712,6 +5978,59 @@ func (ec *executionContext) _Book(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var currentUserImplementors = []string{"CurrentUser"}
+
+func (ec *executionContext) _CurrentUser(ctx context.Context, sel ast.SelectionSet, obj *customTypes.CurrentUser) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, currentUserImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("CurrentUser")
+		case "id":
+
+			out.Values[i] = ec._CurrentUser_id(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "firstName":
+
+			out.Values[i] = ec._CurrentUser_firstName(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "lastName":
+
+			out.Values[i] = ec._CurrentUser_lastName(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "role":
+
+			out.Values[i] = ec._CurrentUser_role(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "mood":
+
+			out.Values[i] = ec._CurrentUser_mood(ctx, field, obj)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -6770,6 +7089,20 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
+func (ec *executionContext) marshalNCurrentUser2githubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐCurrentUser(ctx context.Context, sel ast.SelectionSet, v customTypes.CurrentUser) graphql.Marshaler {
+	return ec._CurrentUser(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNCurrentUser2ᚖgithubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐCurrentUser(ctx context.Context, sel ast.SelectionSet, v *customTypes.CurrentUser) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._CurrentUser(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNID2int(ctx context.Context, v interface{}) (int, error) {
 	res, err := graphql.UnmarshalInt(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -6809,50 +7142,6 @@ func (ec *executionContext) marshalNMood2githubᚗcomᚋAntonioTrupacᚋsocialHa
 	return ec._Mood(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNMood2ᚕᚖgithubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐMoodᚄ(ctx context.Context, sel ast.SelectionSet, v []*customTypes.Mood) graphql.Marshaler {
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalNMood2ᚖgithubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐMood(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-
-	for _, e := range ret {
-		if e == graphql.Null {
-			return graphql.Null
-		}
-	}
-
-	return ret
-}
-
 func (ec *executionContext) marshalNMood2ᚖgithubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐMood(ctx context.Context, sel ast.SelectionSet, v *customTypes.Mood) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -6878,67 +7167,6 @@ func (ec *executionContext) marshalNMoodIntensity2githubᚗcomᚋAntonioTrupac�
 	return v
 }
 
-func (ec *executionContext) unmarshalNMoodIntensity2ᚕgithubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐMoodIntensityᚄ(ctx context.Context, v interface{}) ([]customTypes.MoodIntensity, error) {
-	var vSlice []interface{}
-	if v != nil {
-		vSlice = graphql.CoerceList(v)
-	}
-	var err error
-	res := make([]customTypes.MoodIntensity, len(vSlice))
-	for i := range vSlice {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNMoodIntensity2githubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐMoodIntensity(ctx, vSlice[i])
-		if err != nil {
-			return nil, err
-		}
-	}
-	return res, nil
-}
-
-func (ec *executionContext) marshalNMoodIntensity2ᚕgithubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐMoodIntensityᚄ(ctx context.Context, sel ast.SelectionSet, v []customTypes.MoodIntensity) graphql.Marshaler {
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalNMoodIntensity2githubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐMoodIntensity(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-
-	for _, e := range ret {
-		if e == graphql.Null {
-			return graphql.Null
-		}
-	}
-
-	return ret
-}
-
 func (ec *executionContext) unmarshalNMoodType2githubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐMoodType(ctx context.Context, v interface{}) (customTypes.MoodType, error) {
 	var res customTypes.MoodType
 	err := res.UnmarshalGQL(v)
@@ -6947,67 +7175,6 @@ func (ec *executionContext) unmarshalNMoodType2githubᚗcomᚋAntonioTrupacᚋso
 
 func (ec *executionContext) marshalNMoodType2githubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐMoodType(ctx context.Context, sel ast.SelectionSet, v customTypes.MoodType) graphql.Marshaler {
 	return v
-}
-
-func (ec *executionContext) unmarshalNMoodType2ᚕgithubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐMoodTypeᚄ(ctx context.Context, v interface{}) ([]customTypes.MoodType, error) {
-	var vSlice []interface{}
-	if v != nil {
-		vSlice = graphql.CoerceList(v)
-	}
-	var err error
-	res := make([]customTypes.MoodType, len(vSlice))
-	for i := range vSlice {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNMoodType2githubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐMoodType(ctx, vSlice[i])
-		if err != nil {
-			return nil, err
-		}
-	}
-	return res, nil
-}
-
-func (ec *executionContext) marshalNMoodType2ᚕgithubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐMoodTypeᚄ(ctx context.Context, sel ast.SelectionSet, v []customTypes.MoodType) graphql.Marshaler {
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalNMoodType2githubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐMoodType(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-
-	for _, e := range ret {
-		if e == graphql.Null {
-			return graphql.Null
-		}
-	}
-
-	return ret
 }
 
 func (ec *executionContext) unmarshalNRole2githubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐRole(ctx context.Context, v interface{}) (customTypes.Role, error) {
@@ -7438,6 +7605,54 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	}
 	res := graphql.MarshalBoolean(*v)
 	return res
+}
+
+func (ec *executionContext) marshalOMood2ᚕᚖgithubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐMood(ctx context.Context, sel ast.SelectionSet, v []*customTypes.Mood) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOMood2ᚖgithubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐMood(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
+func (ec *executionContext) marshalOMood2ᚖgithubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐMood(ctx context.Context, sel ast.SelectionSet, v *customTypes.Mood) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Mood(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOMoodInput2ᚖgithubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐMoodInput(ctx context.Context, v interface{}) (*customTypes.MoodInput, error) {

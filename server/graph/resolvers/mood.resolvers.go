@@ -27,7 +27,7 @@ func (r *mutationResolver) DeleteMood(ctx context.Context, id int) (bool, error)
 }
 
 // GetMoods is the resolver for the getMoods field.
-func (r *queryResolver) GetMoods(ctx context.Context) ([]*customTypes.Mood, error) {
+func (r *queryResolver) GetMoods(ctx context.Context) (*customTypes.Mood, error) {
 	panic(fmt.Errorf("not implemented: GetMoods - getMoods"))
 }
 
