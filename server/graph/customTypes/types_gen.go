@@ -53,6 +53,7 @@ type Mood struct {
 	Note      *string       `json:"note"`
 	Types     MoodType      `json:"types"`
 	Intensity MoodIntensity `json:"intensity"`
+	UserID    int           `json:"userId"`
 }
 
 type MoodInput struct {

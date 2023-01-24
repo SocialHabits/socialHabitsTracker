@@ -25,6 +25,7 @@ type Mood {
     note: String
     types: MoodType!
     intensity: MoodIntensity!
+    userId: ID!
 }
 
 input MoodInput {
@@ -34,7 +35,7 @@ input MoodInput {
 }
 
 extend type Query {
-    getMoods(userId: ID): [Mood!]!
+    getMoods: [Mood!]!
     getMood(id: ID!): Mood!
 }
 

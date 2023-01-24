@@ -74,6 +74,7 @@ type ComplexityRoot struct {
 		Intensity func(childComplexity int) int
 		Note      func(childComplexity int) int
 		Types     func(childComplexity int) int
+		UserID    func(childComplexity int) int
 	}
 
 	Mutation struct {
@@ -95,7 +96,7 @@ type ComplexityRoot struct {
 	Query struct {
 		GetAllBooks func(childComplexity int) int
 		GetMood     func(childComplexity int, id int) int
-		GetMoods    func(childComplexity int, userID *int) int
+		GetMoods    func(childComplexity int) int
 		GetOneBook  func(childComplexity int, id int) int
 		GetRole     func(childComplexity int, id int) int
 		GetTodo     func(childComplexity int, todoID int) int
@@ -141,7 +142,7 @@ type QueryResolver interface {
 	GetTodo(ctx context.Context, todoID int) (*customTypes.Todo, error)
 	GetAllBooks(ctx context.Context) ([]*customTypes.Book, error)
 	GetOneBook(ctx context.Context, id int) (*customTypes.Book, error)
-	GetMoods(ctx context.Context, userID *int) ([]*customTypes.Mood, error)
+	GetMoods(ctx context.Context) ([]*customTypes.Mood, error)
 	GetMood(ctx context.Context, id int) (*customTypes.Mood, error)
 	GetUser(ctx context.Context, id int) (*customTypes.CurrentUser, error)
 	GetUsers(ctx context.Context) ([]*customTypes.User, error)
@@ -288,6 +289,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mood.Types(childComplexity), true
+
+	case "Mood.userId":
+		if e.complexity.Mood.UserID == nil {
+			break
+		}
+
+		return e.complexity.Mood.UserID(childComplexity), true
 
 	case "Mutation.CreateBook":
 		if e.complexity.Mutation.CreateBook == nil {
@@ -469,12 +477,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Query_getMoods_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Query.GetMoods(childComplexity, args["userId"].(*int)), true
+		return e.complexity.Query.GetMoods(childComplexity), true
 
 	case "Query.GetOneBook":
 		if e.complexity.Query.GetOneBook == nil {
@@ -985,21 +988,6 @@ func (ec *executionContext) field_Query_getMood_args(ctx context.Context, rawArg
 		}
 	}
 	args["id"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Query_getMoods_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 *int
-	if tmp, ok := rawArgs["userId"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userId"))
-		arg0, err = ec.unmarshalOID2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["userId"] = arg0
 	return args, nil
 }
 
@@ -1702,6 +1690,8 @@ func (ec *executionContext) fieldContext_CurrentUser_mood(ctx context.Context, f
 				return ec.fieldContext_Mood_types(ctx, field)
 			case "intensity":
 				return ec.fieldContext_Mood_intensity(ctx, field)
+			case "userId":
+				return ec.fieldContext_Mood_userId(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Mood", field.Name)
 		},
@@ -1877,6 +1867,50 @@ func (ec *executionContext) fieldContext_Mood_intensity(ctx context.Context, fie
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type MoodIntensity does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mood_userId(ctx context.Context, field graphql.CollectedField, obj *customTypes.Mood) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mood_userId(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UserID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNID2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mood_userId(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mood",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
 		},
 	}
 	return fc, nil
@@ -2293,6 +2327,8 @@ func (ec *executionContext) fieldContext_Mutation_createMood(ctx context.Context
 				return ec.fieldContext_Mood_types(ctx, field)
 			case "intensity":
 				return ec.fieldContext_Mood_intensity(ctx, field)
+			case "userId":
+				return ec.fieldContext_Mood_userId(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Mood", field.Name)
 		},
@@ -2358,6 +2394,8 @@ func (ec *executionContext) fieldContext_Mutation_updateMood(ctx context.Context
 				return ec.fieldContext_Mood_types(ctx, field)
 			case "intensity":
 				return ec.fieldContext_Mood_intensity(ctx, field)
+			case "userId":
+				return ec.fieldContext_Mood_userId(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Mood", field.Name)
 		},
@@ -2947,7 +2985,7 @@ func (ec *executionContext) _Query_getMoods(ctx context.Context, field graphql.C
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().GetMoods(rctx, fc.Args["userId"].(*int))
+		return ec.resolvers.Query().GetMoods(rctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2980,20 +3018,11 @@ func (ec *executionContext) fieldContext_Query_getMoods(ctx context.Context, fie
 				return ec.fieldContext_Mood_types(ctx, field)
 			case "intensity":
 				return ec.fieldContext_Mood_intensity(ctx, field)
+			case "userId":
+				return ec.fieldContext_Mood_userId(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Mood", field.Name)
 		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Query_getMoods_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return
 	}
 	return fc, nil
 }
@@ -3045,6 +3074,8 @@ func (ec *executionContext) fieldContext_Query_getMood(ctx context.Context, fiel
 				return ec.fieldContext_Mood_types(ctx, field)
 			case "intensity":
 				return ec.fieldContext_Mood_intensity(ctx, field)
+			case "userId":
+				return ec.fieldContext_Mood_userId(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Mood", field.Name)
 		},
@@ -6108,6 +6139,13 @@ func (ec *executionContext) _Mood(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "userId":
+
+			out.Values[i] = ec._Mood_userId(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -7679,22 +7717,6 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 		return graphql.Null
 	}
 	res := graphql.MarshalBoolean(*v)
-	return res
-}
-
-func (ec *executionContext) unmarshalOID2ᚖint(ctx context.Context, v interface{}) (*int, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := graphql.UnmarshalInt(v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalOID2ᚖint(ctx context.Context, sel ast.SelectionSet, v *int) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	res := graphql.MarshalInt(*v)
 	return res
 }
 

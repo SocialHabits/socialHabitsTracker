@@ -67,6 +67,7 @@ type Mood struct {
 	Note      string        `gorm:"size:255;not null" json:"note"`
 	Type      MoodType      `gorm:"type:enum('NEGATIVE', 'IRRITATED', 'TENSE', 'ANXIOUS', 'EXCITED', 'CALM', 'HAPPY', 'RELAXED', 'SURPRISED', 'SAD', 'ANGRY', 'DISGUSTED', 'FEARFUL')";"column:type" json:"type"`
 	Intensity MoodIntensity `gorm:"type:enum('HIGH', 'MEDIUM', 'LOW')";"column:intensity" json:"intensity"`
+	UserId    uint64        `gorm:"not null" json:"user_id"`
 }
 
 func (Mood) TableName() string {

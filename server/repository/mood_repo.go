@@ -8,7 +8,7 @@ import (
 )
 
 type MoodRepository interface {
-	CreateMood(moodInput customTypes.MoodInput) (*models.Mood, error)
+	CreateMood(moodInput customTypes.MoodInput, userId uint64) (*models.Mood, error)
 	GetMoodsByUserID(id uint64) ([]*models.Mood, error)
 	UpdateMood(moodInput *customTypes.MoodInput, id int) error
 	GetMoodByID(id int) (*models.Mood, error)
@@ -27,11 +27,16 @@ func NewMoodService(db *gorm.DB) *MoodService {
 	}
 }
 
-func (m MoodService) CreateMood(moodInput customTypes.MoodInput) (*models.Mood, error) {
+func (m MoodService) CreateMood(moodInput customTypes.MoodInput, userId uint64) (*models.Mood, error) {
+	if userId == 0 {
+		return nil, fmt.Errorf("user id cannot be 0")
+	}
+
 	mood := &models.Mood{
 		Note:      *moodInput.Note,
 		Type:      mapMoodTypes(moodInput.Types),
 		Intensity: mapMoodIntensity(moodInput.Intensity),
+		UserId:    userId,
 	}
 
 	err := m.DB.Create(&mood).Error

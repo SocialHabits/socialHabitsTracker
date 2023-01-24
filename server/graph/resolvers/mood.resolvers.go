@@ -7,16 +7,24 @@ package graph
 import (
 	"context"
 	"fmt"
-	"github.com/AntonioTrupac/socialHabitsTracker/middleware"
 
 	generated "github.com/AntonioTrupac/socialHabitsTracker/graph"
 	"github.com/AntonioTrupac/socialHabitsTracker/graph/customTypes"
+	"github.com/AntonioTrupac/socialHabitsTracker/middleware"
 	"github.com/vektah/gqlparser/v2/gqlerror"
 )
 
 // CreateMood is the resolver for the createMood field.
 func (r *mutationResolver) CreateMood(ctx context.Context, input customTypes.MoodInput) (*customTypes.Mood, error) {
-	repoMood, err := r.MoodRepository.CreateMood(input)
+	userClaims := middleware.GetValFromCtx(ctx)
+
+	if userClaims == nil || userClaims.UserId == 0 || userClaims.IsLoggedIn == false {
+		return nil, &gqlerror.Error{
+			Message: "User not authenticated",
+		}
+	}
+
+	repoMood, err := r.MoodRepository.CreateMood(input, userClaims.UserId)
 
 	if err != nil {
 		return nil, &gqlerror.Error{
@@ -29,6 +37,7 @@ func (r *mutationResolver) CreateMood(ctx context.Context, input customTypes.Moo
 		Note:      &repoMood.Note,
 		Types:     generated.ConvertMoodTypeToEnum(repoMood.Type),
 		Intensity: generated.ConvertMoodIntensityToEnum(repoMood.Intensity),
+		UserID:    int(repoMood.UserId),
 	}
 
 	return mood, nil
@@ -53,8 +62,14 @@ func (r *mutationResolver) DeleteMood(ctx context.Context, id int) (bool, error)
 }
 
 // GetMoods is the resolver for the getMoods field.
-func (r *queryResolver) GetMoods(ctx context.Context, userID *int) ([]*customTypes.Mood, error) {
+func (r *queryResolver) GetMoods(ctx context.Context) ([]*customTypes.Mood, error) {
 	userClaims := middleware.GetValFromCtx(ctx)
+
+	if userClaims == nil || userClaims.UserId == 0 || userClaims.IsLoggedIn == false {
+		return nil, &gqlerror.Error{
+			Message: "User not authenticated",
+		}
+	}
 
 	moods, err := r.MoodRepository.GetMoodsByUserID(userClaims.UserId)
 
@@ -72,6 +87,7 @@ func (r *queryResolver) GetMoods(ctx context.Context, userID *int) ([]*customTyp
 			Note:      &mood.Note,
 			Types:     generated.ConvertMoodTypeToEnum(mood.Type),
 			Intensity: generated.ConvertMoodIntensityToEnum(mood.Intensity),
+			UserID:    int(mood.UserId),
 		})
 	}
 
@@ -93,5 +109,6 @@ func (r *queryResolver) GetMood(ctx context.Context, id int) (*customTypes.Mood,
 		Note:      &mood.Note,
 		Types:     generated.ConvertMoodTypeToEnum(mood.Type),
 		Intensity: generated.ConvertMoodIntensityToEnum(mood.Intensity),
+		UserID:    int(mood.UserId),
 	}, nil
 }
