@@ -9,8 +9,10 @@ import (
 
 type MoodRepository interface {
 	CreateMood(moodInput customTypes.MoodInput) (*models.Mood, error)
-	GetMoodsByUserID(id int) ([]*models.Mood, error)
+	GetMoodsByUserID(id uint64) ([]*models.Mood, error)
 	UpdateMood(moodInput *customTypes.MoodInput, id int) error
+	GetMoodByID(id int) (*models.Mood, error)
+	DeleteMood(id int) error
 }
 
 type MoodService struct {
@@ -41,14 +43,49 @@ func (m MoodService) CreateMood(moodInput customTypes.MoodInput) (*models.Mood, 
 	return mood, nil
 }
 
-func (m MoodService) GetMoodsByUserID(id int) ([]*models.Mood, error) {
-	//TODO implement me
-	panic("implement me")
+func (m MoodService) GetMoodsByUserID(id uint64) ([]*models.Mood, error) {
+	var moods []*models.Mood
+
+	err := m.DB.Where("user_id = ?", id).Find(&moods).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return moods, nil
 }
 
 func (m MoodService) UpdateMood(moodInput *customTypes.MoodInput, id int) error {
 	//TODO implement me
 	panic("implement me")
+}
+
+func (m MoodService) GetMoodByID(id int) (*models.Mood, error) {
+	var mood models.Mood
+
+	err := m.DB.First(&mood, id).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &mood, nil
+}
+
+func (m MoodService) DeleteMood(id int) error {
+	mood, err := m.GetMoodByID(id)
+
+	if err != nil {
+		return err
+	}
+
+	err = m.DB.Delete(mood).Error
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func mapMoodTypes(types customTypes.MoodType) models.MoodType {

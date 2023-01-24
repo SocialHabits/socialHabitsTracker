@@ -73,3 +73,18 @@ func ConvertMoodTypeToEnum(moodType models.MoodType) customTypes.MoodType {
 
 	return mood
 }
+
+func ConvertMoodIntensityToEnum(moodIntensity models.MoodIntensity) customTypes.MoodIntensity {
+	var intensity customTypes.MoodIntensity
+
+	switch moodIntensity {
+	case models.Low:
+		intensity = customTypes.MoodIntensityLow
+	case models.Medium:
+		intensity = customTypes.MoodIntensityMedium
+	case models.High:
+		intensity = customTypes.MoodIntensityHigh
+	}
+
+	return intensity
+}

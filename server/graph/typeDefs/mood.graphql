@@ -34,7 +34,7 @@ input MoodInput {
 }
 
 extend type Query {
-    getMoods: Mood!
+    getMoods(userId: ID): [Mood!]!
     getMood(id: ID!): Mood!
 }
 

@@ -7,10 +7,11 @@ package graph
 import (
 	"context"
 	"fmt"
-	generated "github.com/AntonioTrupac/socialHabitsTracker/graph"
-	"github.com/vektah/gqlparser/v2/gqlerror"
+	"github.com/AntonioTrupac/socialHabitsTracker/middleware"
 
+	generated "github.com/AntonioTrupac/socialHabitsTracker/graph"
 	"github.com/AntonioTrupac/socialHabitsTracker/graph/customTypes"
+	"github.com/vektah/gqlparser/v2/gqlerror"
 )
 
 // CreateMood is the resolver for the createMood field.
@@ -24,9 +25,10 @@ func (r *mutationResolver) CreateMood(ctx context.Context, input customTypes.Moo
 	}
 
 	mood := &customTypes.Mood{
-		ID:    int(repoMood.ID),
-		Note:  &repoMood.Note,
-		Types: generated.ConvertMoodTypeToEnum(repoMood.Type),
+		ID:        int(repoMood.ID),
+		Note:      &repoMood.Note,
+		Types:     generated.ConvertMoodTypeToEnum(repoMood.Type),
+		Intensity: generated.ConvertMoodIntensityToEnum(repoMood.Intensity),
 	}
 
 	return mood, nil
@@ -39,15 +41,57 @@ func (r *mutationResolver) UpdateMood(ctx context.Context, id int, input *custom
 
 // DeleteMood is the resolver for the deleteMood field.
 func (r *mutationResolver) DeleteMood(ctx context.Context, id int) (bool, error) {
-	panic(fmt.Errorf("not implemented: DeleteMood - deleteMood"))
+	err := r.MoodRepository.DeleteMood(id)
+
+	if err != nil {
+		return false, &gqlerror.Error{
+			Message: "Could not delete mood",
+		}
+	}
+
+	return true, nil
 }
 
 // GetMoods is the resolver for the getMoods field.
-func (r *queryResolver) GetMoods(ctx context.Context) (*customTypes.Mood, error) {
-	panic(fmt.Errorf("not implemented: GetMoods - getMoods"))
+func (r *queryResolver) GetMoods(ctx context.Context, userID *int) ([]*customTypes.Mood, error) {
+	userClaims := middleware.GetValFromCtx(ctx)
+
+	moods, err := r.MoodRepository.GetMoodsByUserID(userClaims.UserId)
+
+	if err != nil {
+		return nil, &gqlerror.Error{
+			Message: "Could not get moods",
+		}
+	}
+
+	var customMoods []*customTypes.Mood
+
+	for _, mood := range moods {
+		customMoods = append(customMoods, &customTypes.Mood{
+			ID:        int(mood.ID),
+			Note:      &mood.Note,
+			Types:     generated.ConvertMoodTypeToEnum(mood.Type),
+			Intensity: generated.ConvertMoodIntensityToEnum(mood.Intensity),
+		})
+	}
+
+	return customMoods, nil
 }
 
 // GetMood is the resolver for the getMood field.
 func (r *queryResolver) GetMood(ctx context.Context, id int) (*customTypes.Mood, error) {
-	panic(fmt.Errorf("not implemented: GetMood - getMood"))
+	mood, err := r.MoodRepository.GetMoodByID(id)
+
+	if err != nil {
+		return nil, &gqlerror.Error{
+			Message: "Could not get mood",
+		}
+	}
+
+	return &customTypes.Mood{
+		ID:        int(mood.ID),
+		Note:      &mood.Note,
+		Types:     generated.ConvertMoodTypeToEnum(mood.Type),
+		Intensity: generated.ConvertMoodIntensityToEnum(mood.Intensity),
+	}, nil
 }
