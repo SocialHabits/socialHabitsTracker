@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+
 	"github.com/AntonioTrupac/socialHabitsTracker/graph/customTypes"
 	"github.com/AntonioTrupac/socialHabitsTracker/middleware"
 	"github.com/AntonioTrupac/socialHabitsTracker/models"
@@ -66,7 +67,7 @@ func (u UserService) CheckUserEmail(email string) (bool, error) {
 	err := u.Db.Model(&models.User{}).Where("email = ?", email).First(&user).Error
 
 	if errors.Is(err, gorm.ErrRecordNotFound) {
-		fmt.Errorf("user with email %s not found", email)
+		fmt.Printf("user with email %s not found", email)
 		return false, err
 	}
 

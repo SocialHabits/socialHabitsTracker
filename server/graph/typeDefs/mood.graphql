@@ -41,6 +41,6 @@ extend type Query {
 
 extend type Mutation {
     createMood(input: MoodInput!): Mood!
-    updateMood(id: ID!, input: MoodInput): Mood!
+    updateMood(id: ID!, input: MoodInput): String!
     deleteMood(id: ID!): Boolean!
 }

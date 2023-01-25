@@ -6,7 +6,6 @@ package graph
 
 import (
 	"context"
-	"fmt"
 
 	generated "github.com/AntonioTrupac/socialHabitsTracker/graph"
 	"github.com/AntonioTrupac/socialHabitsTracker/graph/customTypes"
@@ -44,8 +43,26 @@ func (r *mutationResolver) CreateMood(ctx context.Context, input customTypes.Moo
 }
 
 // UpdateMood is the resolver for the updateMood field.
-func (r *mutationResolver) UpdateMood(ctx context.Context, id int, input *customTypes.MoodInput) (*customTypes.Mood, error) {
-	panic(fmt.Errorf("not implemented: UpdateMood - updateMood"))
+func (r *mutationResolver) UpdateMood(ctx context.Context, id int, input *customTypes.MoodInput) (string, error) {
+	userClaims := middleware.GetValFromCtx(ctx)
+
+	if userClaims == nil || userClaims.UserId == 0 || userClaims.IsLoggedIn == false {
+		return "", &gqlerror.Error{
+			Message: "User not authenticated",
+		}
+	}
+
+	err := r.MoodRepository.UpdateMood(input, id)
+
+	if err != nil {
+		return "", &gqlerror.Error{
+			Message: "Could not update mood",
+		}
+	}
+
+	successMessage := "successfully updated"
+
+	return successMessage, nil
 }
 
 // DeleteMood is the resolver for the deleteMood field.

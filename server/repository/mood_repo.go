@@ -1,7 +1,9 @@
 package repository
 
 import (
+	"errors"
 	"fmt"
+
 	"github.com/AntonioTrupac/socialHabitsTracker/graph/customTypes"
 	"github.com/AntonioTrupac/socialHabitsTracker/models"
 	"gorm.io/gorm"
@@ -9,9 +11,9 @@ import (
 
 type MoodRepository interface {
 	CreateMood(moodInput customTypes.MoodInput, userId uint64) (*models.Mood, error)
-	GetMoodsByUserID(id uint64) ([]*models.Mood, error)
+	GetMoodsByUserID(userId uint64) ([]*models.Mood, error)
 	UpdateMood(moodInput *customTypes.MoodInput, id int) error
-	GetMoodByID(id int) (*models.Mood, error)
+	GetMoodByID(userId int) (*models.Mood, error)
 	DeleteMood(id int) error
 }
 
@@ -48,10 +50,10 @@ func (m MoodService) CreateMood(moodInput customTypes.MoodInput, userId uint64) 
 	return mood, nil
 }
 
-func (m MoodService) GetMoodsByUserID(id uint64) ([]*models.Mood, error) {
+func (m MoodService) GetMoodsByUserID(userId uint64) ([]*models.Mood, error) {
 	var moods []*models.Mood
 
-	err := m.DB.Where("user_id = ?", id).Find(&moods).Error
+	err := m.DB.Where("user_id = ?", userId).Find(&moods).Error
 
 	if err != nil {
 		return nil, err
@@ -61,14 +63,26 @@ func (m MoodService) GetMoodsByUserID(id uint64) ([]*models.Mood, error) {
 }
 
 func (m MoodService) UpdateMood(moodInput *customTypes.MoodInput, id int) error {
-	//TODO implement me
-	panic("implement me")
+	mood := models.Mood{
+		Note:      *moodInput.Note,
+		Type:      mapMoodTypes(moodInput.Types),
+		Intensity: mapMoodIntensity(moodInput.Intensity),
+		ID:        uint64(id),
+	}
+
+	err := m.DB.Model(&mood).Where("id = ?", id).Updates(mood).Error
+
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return fmt.Errorf("mood with id %d not found", id)
+	}
+
+	return err
 }
 
-func (m MoodService) GetMoodByID(id int) (*models.Mood, error) {
+func (m MoodService) GetMoodByID(userId int) (*models.Mood, error) {
 	var mood models.Mood
 
-	err := m.DB.First(&mood, id).Error
+	err := m.DB.First(&mood, userId).Error
 
 	if err != nil {
 		return nil, err
