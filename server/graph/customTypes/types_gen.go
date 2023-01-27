@@ -78,6 +78,17 @@ type TodoInput struct {
 	Done bool   `json:"done"`
 }
 
+type UpdateMoodInput struct {
+	Note *string `json:"note"`
+}
+
+type UpdateUserInput struct {
+	FirstName *string         `json:"firstName"`
+	LastName  *string         `json:"lastName"`
+	Email     *string         `json:"email"`
+	Address   []*AddressInput `json:"address"`
+}
+
 type User struct {
 	ID        int        `json:"id"`
 	FirstName string     `json:"firstName"`

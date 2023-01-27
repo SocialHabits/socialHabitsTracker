@@ -3,6 +3,8 @@ package models
 import (
 	"database/sql/driver"
 	"fmt"
+	"gorm.io/gorm"
+	"time"
 )
 
 type MoodType string
@@ -68,6 +70,9 @@ type Mood struct {
 	Type      MoodType      `gorm:"type:enum('NEGATIVE', 'IRRITATED', 'TENSE', 'ANXIOUS', 'EXCITED', 'CALM', 'HAPPY', 'RELAXED', 'SURPRISED', 'SAD', 'ANGRY', 'DISGUSTED', 'FEARFUL')";"column:type" json:"type"`
 	Intensity MoodIntensity `gorm:"type:enum('HIGH', 'MEDIUM', 'LOW')";"column:intensity" json:"intensity"`
 	UserId    uint64        `gorm:"not null" json:"user_id"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt gorm.DeletedAt `gorm:"index"`
 }
 
 func (Mood) TableName() string {

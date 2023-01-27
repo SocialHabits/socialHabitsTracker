@@ -43,7 +43,7 @@ func (r *mutationResolver) CreateMood(ctx context.Context, input customTypes.Moo
 }
 
 // UpdateMood is the resolver for the updateMood field.
-func (r *mutationResolver) UpdateMood(ctx context.Context, id int, input *customTypes.MoodInput) (string, error) {
+func (r *mutationResolver) UpdateMood(ctx context.Context, id int, input *customTypes.UpdateMoodInput) (string, error) {
 	userClaims := middleware.GetValFromCtx(ctx)
 
 	if userClaims == nil || userClaims.UserId == 0 || userClaims.IsLoggedIn == false {

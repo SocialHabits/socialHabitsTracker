@@ -56,8 +56,26 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input customTypes.Use
 }
 
 // UpdateUser is the resolver for the updateUser field.
-func (r *mutationResolver) UpdateUser(ctx context.Context, id int, input customTypes.UserInput) (*customTypes.User, error) {
-	panic(fmt.Errorf("not implemented: UpdateUser - updateUser"))
+func (r *mutationResolver) UpdateUser(ctx context.Context, id int, input customTypes.UpdateUserInput) (string, error) {
+	userClaims := middleware.GetValFromCtx(ctx)
+
+	if userClaims == nil || userClaims.UserId == 0 || userClaims.IsLoggedIn == false {
+		return "", &gqlerror.Error{
+			Message: "User not authenticated",
+		}
+	}
+
+	err := r.UserRepository.UpdateUser(input, id)
+
+	if err != nil {
+		return "", &gqlerror.Error{
+			Message: "Could not update mood",
+		}
+	}
+
+	successMessage := "successfully updated"
+
+	return successMessage, nil
 }
 
 // DeleteUser is the resolver for the deleteUser field.
@@ -80,7 +98,7 @@ func (r *mutationResolver) Login(ctx context.Context, input customTypes.LoginInp
 func (r *queryResolver) GetCurrentUser(ctx context.Context, id int) (*customTypes.CurrentUser, error) {
 	userClaims := middleware.GetValFromCtx(ctx)
 
-	if userClaims == nil || userClaims.UserId <= 0 && userClaims.IsLoggedIn == false && userClaims.RoleName != "REGULAR" {
+	if userClaims == nil || userClaims.UserId <= 0 && userClaims.IsLoggedIn == false {
 		return nil, &gqlerror.Error{
 			Message: "User is not authorized or logged in",
 		}

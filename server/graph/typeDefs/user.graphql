@@ -40,6 +40,13 @@ input UserInput {
     role: Role!
 }
 
+input UpdateUserInput {
+    firstName: String
+    lastName: String
+    email: String
+    address: [AddressInput]
+}
+
 input AddressInput {
     street: String!
     city: String!
@@ -63,7 +70,7 @@ extend type Query {
 
 extend type Mutation {
     createUser(input: UserInput!): User!
-    updateUser(id: ID!, input: UserInput!): User!
+    updateUser(id: ID!, input: UpdateUserInput!): String!
     deleteUser(id: ID!): User!
     login(input: LoginInput!): Any!
 }

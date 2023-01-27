@@ -3,6 +3,7 @@ package repository
 import (
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/AntonioTrupac/socialHabitsTracker/graph/customTypes"
 	"github.com/AntonioTrupac/socialHabitsTracker/models"
@@ -12,7 +13,7 @@ import (
 type MoodRepository interface {
 	CreateMood(moodInput customTypes.MoodInput, userId uint64) (*models.Mood, error)
 	GetMoodsByUserID(userId uint64) ([]*models.Mood, error)
-	UpdateMood(moodInput *customTypes.MoodInput, id int) error
+	UpdateMood(moodInput *customTypes.UpdateMoodInput, id int) error
 	GetMoodByID(userId int) (*models.Mood, error)
 	DeleteMood(id int) error
 }
@@ -62,17 +63,17 @@ func (m MoodService) GetMoodsByUserID(userId uint64) ([]*models.Mood, error) {
 	return moods, nil
 }
 
-func (m MoodService) UpdateMood(moodInput *customTypes.MoodInput, id int) error {
-	mood := models.Mood{
-		Note:      *moodInput.Note,
-		Type:      mapMoodTypes(moodInput.Types),
-		Intensity: mapMoodIntensity(moodInput.Intensity),
+func (m MoodService) UpdateMood(moodInput *customTypes.UpdateMoodInput, id int) error {
+	updateMood := models.Mood{
 		ID:        uint64(id),
+		Note:      *moodInput.Note,
+		UpdatedAt: time.Now(),
 	}
 
-	err := m.DB.Model(&mood).Where("id = ?", id).Updates(mood).Error
+	err := m.DB.Model(models.Mood{}).Where("id=?", id).Updates(&updateMood).Error
 
 	if errors.Is(err, gorm.ErrRecordNotFound) {
+		fmt.Println(err)
 		return fmt.Errorf("mood with id %d not found", id)
 	}
 

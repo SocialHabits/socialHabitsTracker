@@ -21,6 +21,7 @@ type UserRepository interface {
 	GetRoleByUserID(id int) (models.UserRole, error)
 	Login(ctx context.Context, email, password string) (interface{}, error)
 	CheckUserEmail(email string) (bool, error)
+	UpdateUser(userInput customTypes.UpdateUserInput, id int) error
 	// UpdateUser(userInput *customTypes.UserInput, id int) error
 }
 
@@ -58,6 +59,32 @@ func (u UserService) GetUsers() ([]*models.User, error) {
 	}
 
 	return users, err
+}
+
+func (u UserService) UpdateUser(userInput customTypes.UpdateUserInput, id int) error {
+	user := &models.User{
+		FirstName: *userInput.FirstName,
+		LastName:  *userInput.LastName,
+		Email:     *userInput.Email,
+	}
+
+	err := u.Db.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Model(&models.User{}).Where("id = ?", id).Updates(user).Error; err != nil {
+			return err
+		}
+
+		if err := tx.Model(&models.Address{}).Where("user_id = ?", id).Updates(userInput.Address).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // CheckUserEmail check if user email already exists

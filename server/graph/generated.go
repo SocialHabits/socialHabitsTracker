@@ -88,9 +88,9 @@ type ComplexityRoot struct {
 		DeleteUser func(childComplexity int, id int) int
 		Login      func(childComplexity int, input customTypes.LoginInput) int
 		UpdateBook func(childComplexity int, id int, input customTypes.BookInput) int
-		UpdateMood func(childComplexity int, id int, input *customTypes.MoodInput) int
+		UpdateMood func(childComplexity int, id int, input *customTypes.UpdateMoodInput) int
 		UpdateTodo func(childComplexity int, input customTypes.TodoInput) int
-		UpdateUser func(childComplexity int, id int, input customTypes.UserInput) int
+		UpdateUser func(childComplexity int, id int, input customTypes.UpdateUserInput) int
 	}
 
 	Query struct {
@@ -130,10 +130,10 @@ type MutationResolver interface {
 	DeleteBook(ctx context.Context, id int) (string, error)
 	UpdateBook(ctx context.Context, id int, input customTypes.BookInput) (string, error)
 	CreateMood(ctx context.Context, input customTypes.MoodInput) (*customTypes.Mood, error)
-	UpdateMood(ctx context.Context, id int, input *customTypes.MoodInput) (string, error)
+	UpdateMood(ctx context.Context, id int, input *customTypes.UpdateMoodInput) (string, error)
 	DeleteMood(ctx context.Context, id int) (bool, error)
 	CreateUser(ctx context.Context, input customTypes.UserInput) (*customTypes.User, error)
-	UpdateUser(ctx context.Context, id int, input customTypes.UserInput) (*customTypes.User, error)
+	UpdateUser(ctx context.Context, id int, input customTypes.UpdateUserInput) (string, error)
 	DeleteUser(ctx context.Context, id int) (*customTypes.User, error)
 	Login(ctx context.Context, input customTypes.LoginInput) (interface{}, error)
 }
@@ -427,7 +427,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.UpdateMood(childComplexity, args["id"].(int), args["input"].(*customTypes.MoodInput)), true
+		return e.complexity.Mutation.UpdateMood(childComplexity, args["id"].(int), args["input"].(*customTypes.UpdateMoodInput)), true
 
 	case "Mutation.updateTodo":
 		if e.complexity.Mutation.UpdateTodo == nil {
@@ -451,7 +451,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.UpdateUser(childComplexity, args["id"].(int), args["input"].(customTypes.UserInput)), true
+		return e.complexity.Mutation.UpdateUser(childComplexity, args["id"].(int), args["input"].(customTypes.UpdateUserInput)), true
 
 	case "Query.GetAllBooks":
 		if e.complexity.Query.GetAllBooks == nil {
@@ -625,6 +625,8 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputMoodInput,
 		ec.unmarshalInputRoleInput,
 		ec.unmarshalInputTodoInput,
+		ec.unmarshalInputUpdateMoodInput,
+		ec.unmarshalInputUpdateUserInput,
 		ec.unmarshalInputUserInput,
 	)
 	first := true
@@ -895,10 +897,10 @@ func (ec *executionContext) field_Mutation_updateMood_args(ctx context.Context, 
 		}
 	}
 	args["id"] = arg0
-	var arg1 *customTypes.MoodInput
+	var arg1 *customTypes.UpdateMoodInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg1, err = ec.unmarshalOMoodInput2ᚖgithubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐMoodInput(ctx, tmp)
+		arg1, err = ec.unmarshalOUpdateMoodInput2ᚖgithubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐUpdateMoodInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -934,10 +936,10 @@ func (ec *executionContext) field_Mutation_updateUser_args(ctx context.Context, 
 		}
 	}
 	args["id"] = arg0
-	var arg1 customTypes.UserInput
+	var arg1 customTypes.UpdateUserInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg1, err = ec.unmarshalNUserInput2githubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐUserInput(ctx, tmp)
+		arg1, err = ec.unmarshalNUpdateUserInput2githubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐUpdateUserInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -2361,7 +2363,7 @@ func (ec *executionContext) _Mutation_updateMood(ctx context.Context, field grap
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UpdateMood(rctx, fc.Args["id"].(int), fc.Args["input"].(*customTypes.MoodInput))
+		return ec.resolvers.Mutation().UpdateMood(rctx, fc.Args["id"].(int), fc.Args["input"].(*customTypes.UpdateMoodInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2542,7 +2544,7 @@ func (ec *executionContext) _Mutation_updateUser(ctx context.Context, field grap
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UpdateUser(rctx, fc.Args["id"].(int), fc.Args["input"].(customTypes.UserInput))
+		return ec.resolvers.Mutation().UpdateUser(rctx, fc.Args["id"].(int), fc.Args["input"].(customTypes.UpdateUserInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2554,9 +2556,9 @@ func (ec *executionContext) _Mutation_updateUser(ctx context.Context, field grap
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*customTypes.User)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalNUser2ᚖgithubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐUser(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_updateUser(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2566,23 +2568,7 @@ func (ec *executionContext) fieldContext_Mutation_updateUser(ctx context.Context
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_User_id(ctx, field)
-			case "firstName":
-				return ec.fieldContext_User_firstName(ctx, field)
-			case "lastName":
-				return ec.fieldContext_User_lastName(ctx, field)
-			case "email":
-				return ec.fieldContext_User_email(ctx, field)
-			case "password":
-				return ec.fieldContext_User_password(ctx, field)
-			case "address":
-				return ec.fieldContext_User_address(ctx, field)
-			case "role":
-				return ec.fieldContext_User_role(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	defer func() {
@@ -5858,6 +5844,86 @@ func (ec *executionContext) unmarshalInputTodoInput(ctx context.Context, obj int
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputUpdateMoodInput(ctx context.Context, obj interface{}) (customTypes.UpdateMoodInput, error) {
+	var it customTypes.UpdateMoodInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"note"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "note":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("note"))
+			it.Note, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUpdateUserInput(ctx context.Context, obj interface{}) (customTypes.UpdateUserInput, error) {
+	var it customTypes.UpdateUserInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"firstName", "lastName", "email", "address"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "firstName":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("firstName"))
+			it.FirstName, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "lastName":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("lastName"))
+			it.LastName, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "email":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
+			it.Email, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "address":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("address"))
+			it.Address, err = ec.unmarshalOAddressInput2ᚕᚖgithubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐAddressInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputUserInput(ctx context.Context, obj interface{}) (customTypes.UserInput, error) {
 	var it customTypes.UserInput
 	asMap := map[string]interface{}{}
@@ -7366,6 +7432,11 @@ func (ec *executionContext) unmarshalNTodoInput2githubᚗcomᚋAntonioTrupacᚋs
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) unmarshalNUpdateUserInput2githubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐUpdateUserInput(ctx context.Context, v interface{}) (customTypes.UpdateUserInput, error) {
+	res, err := ec.unmarshalInputUpdateUserInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) marshalNUser2githubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐUser(ctx context.Context, sel ast.SelectionSet, v customTypes.User) graphql.Marshaler {
 	return ec._User(ctx, sel, &v)
 }
@@ -7682,6 +7753,34 @@ func (ec *executionContext) marshalN__TypeKind2string(ctx context.Context, sel a
 	return res
 }
 
+func (ec *executionContext) unmarshalOAddressInput2ᚕᚖgithubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐAddressInput(ctx context.Context, v interface{}) ([]*customTypes.AddressInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*customTypes.AddressInput, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalOAddressInput2ᚖgithubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐAddressInput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalOAddressInput2ᚖgithubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐAddressInput(ctx context.Context, v interface{}) (*customTypes.AddressInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputAddressInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalOBoolean2bool(ctx context.Context, v interface{}) (bool, error) {
 	res, err := graphql.UnmarshalBoolean(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -7756,14 +7855,6 @@ func (ec *executionContext) marshalOMood2ᚖgithubᚗcomᚋAntonioTrupacᚋsocia
 	return ec._Mood(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalOMoodInput2ᚖgithubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐMoodInput(ctx context.Context, v interface{}) (*customTypes.MoodInput, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalInputMoodInput(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
 func (ec *executionContext) unmarshalOString2ᚖstring(ctx context.Context, v interface{}) (*string, error) {
 	if v == nil {
 		return nil, nil
@@ -7778,6 +7869,14 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 	}
 	res := graphql.MarshalString(*v)
 	return res
+}
+
+func (ec *executionContext) unmarshalOUpdateMoodInput2ᚖgithubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐUpdateMoodInput(ctx context.Context, v interface{}) (*customTypes.UpdateMoodInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputUpdateMoodInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalO__EnumValue2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐEnumValueᚄ(ctx context.Context, sel ast.SelectionSet, v []introspection.EnumValue) graphql.Marshaler {
