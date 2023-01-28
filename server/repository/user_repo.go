@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+
 	"github.com/AntonioTrupac/socialHabitsTracker/graph/customTypes"
 	"github.com/AntonioTrupac/socialHabitsTracker/middleware"
 	"github.com/AntonioTrupac/socialHabitsTracker/models"
@@ -20,6 +21,7 @@ type UserRepository interface {
 	GetRoleByUserID(id int) (models.UserRole, error)
 	Login(ctx context.Context, email, password string) (interface{}, error)
 	CheckUserEmail(email string) (bool, error)
+	UpdateUser(userInput customTypes.UpdateUserInput, id int) error
 	// UpdateUser(userInput *customTypes.UserInput, id int) error
 }
 
@@ -38,7 +40,7 @@ func NewUserService(db *gorm.DB) *UserService {
 func (u UserService) GetUserById(id int) (*models.User, error) {
 	var user models.User
 
-	err := u.Db.Model(&models.User{}).Preload("Address").Where("id = ?", id).First(&user).Error
+	err := u.Db.Model(&models.User{}).Where("id = ?", id).First(&user).Error
 
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		fmt.Printf("User with id %d not found", id)
@@ -59,6 +61,32 @@ func (u UserService) GetUsers() ([]*models.User, error) {
 	return users, err
 }
 
+func (u UserService) UpdateUser(userInput customTypes.UpdateUserInput, id int) error {
+	user := &models.User{
+		FirstName: *userInput.FirstName,
+		LastName:  *userInput.LastName,
+		Email:     *userInput.Email,
+	}
+
+	err := u.Db.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Model(&models.User{}).Where("id = ?", id).Updates(user).Error; err != nil {
+			return err
+		}
+
+		if err := tx.Model(&models.Address{}).Where("user_id = ?", id).Updates(userInput.Address).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // CheckUserEmail check if user email already exists
 func (u UserService) CheckUserEmail(email string) (bool, error) {
 	var user *models.User
@@ -66,7 +94,7 @@ func (u UserService) CheckUserEmail(email string) (bool, error) {
 	err := u.Db.Model(&models.User{}).Where("email = ?", email).First(&user).Error
 
 	if errors.Is(err, gorm.ErrRecordNotFound) {
-		fmt.Errorf("user with email %s not found", email)
+		fmt.Printf("user with email %s not found", email)
 		return false, err
 	}
 

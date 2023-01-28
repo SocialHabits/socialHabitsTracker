@@ -35,9 +35,31 @@ type BookInput struct {
 	Publisher string `json:"publisher"`
 }
 
+type CurrentUser struct {
+	ID        int     `json:"id"`
+	FirstName string  `json:"firstName"`
+	LastName  string  `json:"lastName"`
+	Role      Role    `json:"role"`
+	Mood      []*Mood `json:"mood"`
+}
+
 type LoginInput struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
+}
+
+type Mood struct {
+	ID        int           `json:"id"`
+	Note      *string       `json:"note"`
+	Types     MoodType      `json:"types"`
+	Intensity MoodIntensity `json:"intensity"`
+	UserID    int           `json:"userId"`
+}
+
+type MoodInput struct {
+	Note      *string       `json:"note"`
+	Types     MoodType      `json:"types"`
+	Intensity MoodIntensity `json:"intensity"`
 }
 
 type RoleInput struct {
@@ -54,6 +76,17 @@ type TodoInput struct {
 	ID   int    `json:"id"`
 	Text string `json:"text"`
 	Done bool   `json:"done"`
+}
+
+type UpdateMoodInput struct {
+	Note *string `json:"note"`
+}
+
+type UpdateUserInput struct {
+	FirstName *string         `json:"firstName"`
+	LastName  *string         `json:"lastName"`
+	Email     *string         `json:"email"`
+	Address   []*AddressInput `json:"address"`
 }
 
 type User struct {
@@ -73,6 +106,112 @@ type UserInput struct {
 	Password  string          `json:"password"`
 	Address   []*AddressInput `json:"address"`
 	Role      Role            `json:"role"`
+}
+
+type MoodIntensity string
+
+const (
+	MoodIntensityLow    MoodIntensity = "LOW"
+	MoodIntensityMedium MoodIntensity = "MEDIUM"
+	MoodIntensityHigh   MoodIntensity = "HIGH"
+)
+
+var AllMoodIntensity = []MoodIntensity{
+	MoodIntensityLow,
+	MoodIntensityMedium,
+	MoodIntensityHigh,
+}
+
+func (e MoodIntensity) IsValid() bool {
+	switch e {
+	case MoodIntensityLow, MoodIntensityMedium, MoodIntensityHigh:
+		return true
+	}
+	return false
+}
+
+func (e MoodIntensity) String() string {
+	return string(e)
+}
+
+func (e *MoodIntensity) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = MoodIntensity(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid MoodIntensity", str)
+	}
+	return nil
+}
+
+func (e MoodIntensity) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type MoodType string
+
+const (
+	MoodTypeIrritated MoodType = "IRRITATED"
+	MoodTypeTense     MoodType = "TENSE"
+	MoodTypeExcited   MoodType = "EXCITED"
+	MoodTypeCalm      MoodType = "CALM"
+	MoodTypeHappy     MoodType = "HAPPY"
+	MoodTypeSad       MoodType = "SAD"
+	MoodTypeAngry     MoodType = "ANGRY"
+	MoodTypeFearful   MoodType = "FEARFUL"
+	MoodTypeDisgusted MoodType = "DISGUSTED"
+	MoodTypeSurprised MoodType = "SURPRISED"
+	MoodTypeAnxious   MoodType = "ANXIOUS"
+	MoodTypeNegative  MoodType = "NEGATIVE"
+	MoodTypeRelaxed   MoodType = "RELAXED"
+)
+
+var AllMoodType = []MoodType{
+	MoodTypeIrritated,
+	MoodTypeTense,
+	MoodTypeExcited,
+	MoodTypeCalm,
+	MoodTypeHappy,
+	MoodTypeSad,
+	MoodTypeAngry,
+	MoodTypeFearful,
+	MoodTypeDisgusted,
+	MoodTypeSurprised,
+	MoodTypeAnxious,
+	MoodTypeNegative,
+	MoodTypeRelaxed,
+}
+
+func (e MoodType) IsValid() bool {
+	switch e {
+	case MoodTypeIrritated, MoodTypeTense, MoodTypeExcited, MoodTypeCalm, MoodTypeHappy, MoodTypeSad, MoodTypeAngry, MoodTypeFearful, MoodTypeDisgusted, MoodTypeSurprised, MoodTypeAnxious, MoodTypeNegative, MoodTypeRelaxed:
+		return true
+	}
+	return false
+}
+
+func (e MoodType) String() string {
+	return string(e)
+}
+
+func (e *MoodType) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = MoodType(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid MoodType", str)
+	}
+	return nil
+}
+
+func (e MoodType) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
 type Role string

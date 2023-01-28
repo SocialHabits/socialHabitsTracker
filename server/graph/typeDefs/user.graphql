@@ -8,6 +8,14 @@ type User {
     role: Role!
 }
 
+type CurrentUser {
+    id: ID!
+    firstName: String!
+    lastName: String!
+    role: Role!
+    mood: [Mood]
+}
+
 enum Role {
     ADMIN
     REGULAR
@@ -32,6 +40,13 @@ input UserInput {
     role: Role!
 }
 
+input UpdateUserInput {
+    firstName: String
+    lastName: String
+    email: String
+    address: [AddressInput]
+}
+
 input AddressInput {
     street: String!
     city: String!
@@ -48,14 +63,14 @@ input LoginInput {
 }
 
 extend type Query {
-    getUser(id: ID!): User!
+    getCurrentUser(id: ID!): CurrentUser!
     getUsers: [User!]!
     getRole(id: Int!): Role!
 }
 
 extend type Mutation {
     createUser(input: UserInput!): User!
-    updateUser(id: ID!, input: UserInput!): User!
+    updateUser(id: ID!, input: UpdateUserInput!): String!
     deleteUser(id: ID!): User!
     login(input: LoginInput!): Any!
 }

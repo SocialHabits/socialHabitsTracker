@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  docker-gs-ping:
+    build:
+        context: .
+    container_name: social_habits_server
+    networks:
+      - social_habits_network
+    ports:
+      - 80:8080
+    deploy:
+      restart_policy:
+        condition: on-failure
+
+networks:
+  social_habits_network:
+    driver: bridge

@@ -40,6 +40,7 @@ type User struct {
 	Password  string `gorm:"size:255;not null" json:"password"`
 	Address   []*Address
 	Role      UserRole `gorm:"type:enum('ADMIN', 'REGULAR', 'PREMIUM', 'TRAINER')";"column:role" json:"role"`
+	Mood      []*Mood
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	DeletedAt gorm.DeletedAt `gorm:"index"`

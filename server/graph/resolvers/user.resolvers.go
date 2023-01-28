@@ -21,7 +21,7 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input customTypes.Use
 	isValid := validation(ctx, input)
 
 	if !isValid {
-		return nil, ErrInput
+		return nil, errors.New("input errors")
 	}
 
 	// check if user email already exists
@@ -56,8 +56,26 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input customTypes.Use
 }
 
 // UpdateUser is the resolver for the updateUser field.
-func (r *mutationResolver) UpdateUser(ctx context.Context, id int, input customTypes.UserInput) (*customTypes.User, error) {
-	panic(fmt.Errorf("not implemented: UpdateUser - updateUser"))
+func (r *mutationResolver) UpdateUser(ctx context.Context, id int, input customTypes.UpdateUserInput) (string, error) {
+	userClaims := middleware.GetValFromCtx(ctx)
+
+	if userClaims == nil || userClaims.UserId == 0 || userClaims.IsLoggedIn == false {
+		return "", &gqlerror.Error{
+			Message: "User not authenticated",
+		}
+	}
+
+	err := r.UserRepository.UpdateUser(input, id)
+
+	if err != nil {
+		return "", &gqlerror.Error{
+			Message: "Could not update mood",
+		}
+	}
+
+	successMessage := "successfully updated"
+
+	return successMessage, nil
 }
 
 // DeleteUser is the resolver for the deleteUser field.
@@ -70,17 +88,17 @@ func (r *mutationResolver) Login(ctx context.Context, input customTypes.LoginInp
 	isValid := validation(ctx, input)
 
 	if !isValid {
-		return nil, ErrInput
+		return nil, errors.New("input errors")
 	}
 
 	return r.UserRepository.Login(ctx, input.Email, input.Password)
 }
 
-// GetUser is the resolver for the getUser field.
-func (r *queryResolver) GetUser(ctx context.Context, id int) (*customTypes.User, error) {
+// GetCurrentUser is the resolver for the getCurrentUser field.
+func (r *queryResolver) GetCurrentUser(ctx context.Context, id int) (*customTypes.CurrentUser, error) {
 	userClaims := middleware.GetValFromCtx(ctx)
 
-	if userClaims == nil || userClaims.UserId <= 0 && userClaims.IsLoggedIn == false && userClaims.RoleName != "REGULAR" {
+	if userClaims == nil || userClaims.UserId <= 0 && userClaims.IsLoggedIn == false {
 		return nil, &gqlerror.Error{
 			Message: "User is not authorized or logged in",
 		}
@@ -88,13 +106,11 @@ func (r *queryResolver) GetUser(ctx context.Context, id int) (*customTypes.User,
 
 	user, err := r.UserRepository.GetUserById(id)
 
-	userGql := &customTypes.User{
+	userGql := &customTypes.CurrentUser{
 		FirstName: user.FirstName,
 		LastName:  user.LastName,
-		Email:     user.Email,
 		Role:      generated.ConvertModelRoleToEnum(user.Role),
 		ID:        int(user.ID),
-		Address:   generated.MapAddressModelToGqlType(user.Address),
 	}
 
 	if err != nil {
@@ -173,13 +189,3 @@ func (r *queryResolver) GetRole(ctx context.Context, id int) (customTypes.Role, 
 
 	return roleGql, nil
 }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//   - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//     it when you're done.
-//   - You have helper methods in this file. Move them out to keep these resolver files clean.
-var (
-	ErrInput = errors.New("input errors")
-)
