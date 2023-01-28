@@ -22,6 +22,6 @@ jobs:
         go-version: 1.19.4
 
     - name: Install dependencies
-        run: go get ./server
+        run: go get ../server
     - name: Build
         run: go build -v ./...
