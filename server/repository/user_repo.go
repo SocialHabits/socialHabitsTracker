@@ -55,7 +55,7 @@ func (u UserService) GetUsers() ([]*models.User, error) {
 	err := u.Db.Model(&models.User{}).Preload("Address").Find(&users).Error
 
 	if errors.Is(err, gorm.ErrRecordNotFound) {
-		fmt.Printf("No users found")
+		fmt.Printf("Could not find any users")
 	}
 
 	return users, err
