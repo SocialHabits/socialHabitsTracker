@@ -11,18 +11,19 @@ defaults:
   working-directory: ./server
 
 jobs: 
-  golangci: 
+  build: 
     name: lint
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v3
       - name: Setup Go
         uses: actions/setup-go@v3
         with:
-          go-version-file: go.mod
+          go-version-file: ./server/go.mod
           check-latest: true
           cache: true
-          cache-dependency-path: go.sum   
+          cache-dependency-path: ./server/go.sum 
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v3
         with:
