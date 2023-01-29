@@ -3,11 +3,12 @@ package middleware
 import (
 	"context"
 	"errors"
+	"net/http"
+	"time"
+
 	"github.com/AntonioTrupac/socialHabitsTracker/models"
 	"github.com/AntonioTrupac/socialHabitsTracker/util"
 	"github.com/gin-gonic/gin"
-	"net/http"
-	"time"
 )
 
 const cookieAccessKeyCtx = "cookieAccess"
@@ -59,7 +60,7 @@ func extractUserIdAndRoleName(ctx *gin.Context) (*CookieContent, error) {
 	return &CookieContent{UserId: claims.UserID, RoleName: claims.RoleName}, err
 }
 
-func setValInCtx(ctx *gin.Context, val interface{}) {
+func setValInCtx(ctx *gin.Context, val *CookieAccess) {
 	newCtx := context.WithValue(ctx.Request.Context(), cookieAccessKeyCtx, val)
 	ctx.Request = ctx.Request.WithContext(newCtx)
 }
