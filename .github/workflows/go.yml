@@ -19,7 +19,10 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v3
         with:
-          go-version: '1.19.x'
+          go-version: ./server/go.mod
+          check-latest: true
+          cache: true
+          cache-dependency-path: ./server/go.sum   
       - name: Install dependencies
         run: go get .
       - name: Build
