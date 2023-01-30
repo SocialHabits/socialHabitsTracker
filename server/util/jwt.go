@@ -2,11 +2,12 @@ package util
 
 import (
 	"fmt"
+	"os"
+	"time"
+
 	"github.com/AntonioTrupac/socialHabitsTracker/models"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/google/uuid"
-	"os"
-	"time"
 )
 
 type Claims struct {
@@ -19,20 +20,8 @@ type Claims struct {
 
 var accessTokenSecret = []byte(getAccessTokenSecret())
 
-//var refreshTokenSecret = []byte(getRefreshTokenSecret())
-
 func getAccessTokenSecret() string {
 	secret := os.Getenv("ACCESS_SECRET")
-
-	if secret == "" {
-		return ""
-	}
-
-	return secret
-}
-
-func getRefreshTokenSecret() string {
-	secret := os.Getenv("REFRESH_SECRET")
 
 	if secret == "" {
 		return ""
