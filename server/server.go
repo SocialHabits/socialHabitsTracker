@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/AntonioTrupac/socialHabitsTracker/database"
 	generated "github.com/AntonioTrupac/socialHabitsTracker/graph"
 	resolvers "github.com/AntonioTrupac/socialHabitsTracker/graph/resolvers"
@@ -50,18 +52,29 @@ func playgroundHandler() gin.HandlerFunc {
 func main() {
 	err := godotenv.Load(".env")
 
+	if err != nil {
+		panic(err)
+	}
+
 	db, err := database.InitDb()
 
 	if err != nil {
 		panic(err)
 	}
 
-	db.AutoMigrate(&models.Book{}, &models.User{}, &models.Address{}, &models.Mood{})
+	err = db.AutoMigrate(&models.Book{}, &models.User{}, &models.Address{}, &models.Mood{})
+
+	if err != nil {
+		fmt.Printf("Error while migrating: %v", err)
+		panic(err)
+	}
 
 	port := os.Getenv("PORT")
+
 	if port == "" {
 		port = defaultPort
 	}
+
 	r := gin.Default()
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"http://localhost:3000"},
@@ -74,5 +87,10 @@ func main() {
 	r.Use(middleware.AuthMiddleware())
 	r.POST("/query", graphqlHandler(db))
 	r.GET("/", playgroundHandler())
-	r.Run(":" + port)
+	err = r.Run(":" + port)
+
+	if err != nil {
+		fmt.Printf("Error while running server: %v", err)
+		panic(err)
+	}
 }
