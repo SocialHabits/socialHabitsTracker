@@ -206,7 +206,7 @@ func mapUserInputRoleToUserRole(role customTypes.Role) models.UserRole {
 }
 
 func mapAddressInput(addressInput []*customTypes.AddressInput, id uint) ([]*models.Address, error) {
-	if addressInput == nil || len(addressInput) == 0 {
+	if addressInput == nil {
 		return nil, fmt.Errorf("addressInput is required")
 	}
 
