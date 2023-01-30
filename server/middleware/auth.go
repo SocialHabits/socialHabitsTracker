@@ -3,14 +3,22 @@ package middleware
 import (
 	"context"
 	"errors"
+	"fmt"
+	"net/http"
+	"time"
+
 	"github.com/AntonioTrupac/socialHabitsTracker/models"
 	"github.com/AntonioTrupac/socialHabitsTracker/util"
 	"github.com/gin-gonic/gin"
-	"net/http"
-	"time"
 )
 
-const cookieAccessKeyCtx = "cookieAccess"
+type cookieKeyCtx string
+
+func (c cookieKeyCtx) String() string {
+	return string(c)
+}
+
+var cAccessKeyCtx = cookieKeyCtx("cookieAccess")
 
 type CookieAccess struct {
 	Writer     http.ResponseWriter
@@ -60,12 +68,13 @@ func extractUserIdAndRoleName(ctx *gin.Context) (*CookieContent, error) {
 }
 
 func setValInCtx(ctx *gin.Context, val interface{}) {
-	newCtx := context.WithValue(ctx.Request.Context(), cookieAccessKeyCtx, val)
+	newCtx := context.WithValue(ctx.Request.Context(), cAccessKeyCtx, val)
 	ctx.Request = ctx.Request.WithContext(newCtx)
 }
 
 func GetValFromCtx(ctx context.Context) *CookieAccess {
-	raw := ctx.Value(cookieAccessKeyCtx).(*CookieAccess)
+	raw := ctx.Value(cAccessKeyCtx).(*CookieAccess)
+	fmt.Println(raw)
 	return raw
 }
 
@@ -100,5 +109,5 @@ func AuthMiddleware() gin.HandlerFunc {
 }
 
 func GetCookieAccess(ctx context.Context) *CookieAccess {
-	return ctx.Value(cookieAccessKeyCtx).(*CookieAccess)
+	return ctx.Value(cAccessKeyCtx).(*CookieAccess)
 }

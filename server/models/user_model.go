@@ -3,8 +3,9 @@ package models
 import (
 	"database/sql/driver"
 	"fmt"
-	"gorm.io/gorm"
 	"time"
+
+	"gorm.io/gorm"
 )
 
 type UserRole string
@@ -39,7 +40,7 @@ type User struct {
 	Email     string `gorm:"size:255;not null" json:"email"`
 	Password  string `gorm:"size:255;not null" json:"password"`
 	Address   []*Address
-	Role      UserRole `gorm:"type:enum('ADMIN', 'REGULAR', 'PREMIUM', 'TRAINER')";"column:role" json:"role"`
+	Role      UserRole `gorm:"type:enum('ADMIN','REGULAR','PREMIUM','TRAINER')" column:"role" json:"role"`
 	Mood      []*Mood
 	CreatedAt time.Time
 	UpdatedAt time.Time
