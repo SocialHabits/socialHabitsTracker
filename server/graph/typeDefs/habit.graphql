@@ -18,14 +18,22 @@ type Habit {
     userId: ID
 }
 
+type CreateHabitInput {
+    name: String!
+    goal: Int
+    startDate: String!
+    endDate: String!
+    type: HabitType!
+}
+
 extend type Query {
     getHabits: [Habit]
     getHabit(id: ID!): Habit
 }
 
 extend type Mutation {
-    createHabit(name: String!, goal: Int!, startDate: String!, endDate: String!, type: HabitType!): Habit
-    updateHabit(id: ID!, name: String!, goal: Int!, startDate: String!, endDate: String!, type: HabitType!): Habit
+    createHabit(input: CreateHabitInput): Habit
+    updateHabit(id: ID!, input: CreateHabitInput): Habit
     deleteHabit(id: ID!): Habit
     completeHabit(id: ID!): Habit
     skipHabit(id: ID!): Habit
