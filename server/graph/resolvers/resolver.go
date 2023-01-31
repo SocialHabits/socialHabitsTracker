@@ -7,7 +7,8 @@ import "github.com/AntonioTrupac/socialHabitsTracker/repository"
 // It serves as dependency injection for your app, add any dependencies you require here.
 
 type Resolver struct {
-	BookRepository repository.BookRepository
-	UserRepository repository.UserRepository
-	MoodRepository repository.MoodRepository
+	BookRepository  repository.BookRepository
+	UserRepository  repository.UserRepository
+	MoodRepository  repository.MoodRepository
+	HabitRepository repository.HabitRepository
 }

@@ -10,7 +10,7 @@ import (
 )
 
 type HabitRepository interface {
-	CreateHabit(habitInput customTypes.CreateHabitInput, userId uint64) (*models.Habit, error)
+	CreateHabit(habitInput *customTypes.CreateHabitInput, userId uint64) (*models.Habit, error)
 }
 
 type HabitService struct {
@@ -26,7 +26,7 @@ func NewHabitService(db *gorm.DB) *HabitService {
 }
 
 // CreateHabit implements HabitRepository
-func (h *HabitService) CreateHabit(habitInput customTypes.CreateHabitInput, userId uint64) (*models.Habit, error) {
+func (h *HabitService) CreateHabit(habitInput *customTypes.CreateHabitInput, userId uint64) (*models.Habit, error) {
 	if userId == 0 {
 		return nil, fmt.Errorf("user id cannot be 0")
 	}

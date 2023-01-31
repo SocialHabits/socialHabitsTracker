@@ -9,11 +9,46 @@ import (
 	"fmt"
 
 	"github.com/AntonioTrupac/socialHabitsTracker/graph/customTypes"
+	"github.com/AntonioTrupac/socialHabitsTracker/middleware"
+	"github.com/vektah/gqlparser/v2/gqlerror"
 )
 
 // CreateHabit is the resolver for the createHabit field.
 func (r *mutationResolver) CreateHabit(ctx context.Context, input *customTypes.CreateHabitInput) (*customTypes.Habit, error) {
-	panic(fmt.Errorf("not implemented: CreateHabit - createHabit"))
+	userClaims := middleware.GetValFromCtx(ctx)
+
+	if userClaims == nil || userClaims.UserId == 0 || userClaims.IsLoggedIn == false {
+		return nil, &gqlerror.Error{
+			Message: "User not authenticated",
+		}
+	}
+
+	repoHabit, err := r.HabitRepository.CreateHabit(input, userClaims.UserId)
+
+	if err != nil {
+		return nil, &gqlerror.Error{
+			Message: "Could not create habit",
+		}
+	}
+
+	id := int(repoHabit.ID)
+
+	habit := &customTypes.Habit{
+		ID:        int(repoHabit.ID),
+		Name:      repoHabit.Name,
+		Skipped:   repoHabit.Skipped,
+		Completed: repoHabit.Completed,
+		Streak:    repoHabit.Streak,
+		Failed:    repoHabit.Failed,
+		Total:     repoHabit.Total,
+		UserID:    &id,
+		Goal:      repoHabit.Goal,
+		// StartDate: repoHabit.StartDate,
+		// EndDate:   repoHabit.EndDate,
+		Type: customTypes.HabitType(repoHabit.Type),
+	}
+
+	return habit, nil
 }
 
 // UpdateHabit is the resolver for the updateHabit field.

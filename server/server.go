@@ -27,11 +27,13 @@ func graphqlHandler(db *gorm.DB) gin.HandlerFunc {
 	bookRepo := repository.NewBookService(db)
 	userRepo := repository.NewUserService(db)
 	moodRepo := repository.NewMoodService(db)
+	habitRepo := repository.NewHabitService(db)
 
 	c := generated.Config{Resolvers: &resolvers.Resolver{
-		BookRepository: bookRepo,
-		UserRepository: userRepo,
-		MoodRepository: moodRepo,
+		BookRepository:  bookRepo,
+		UserRepository:  userRepo,
+		MoodRepository:  moodRepo,
+		HabitRepository: habitRepo,
 	}}
 
 	h := handler.NewDefaultServer(generated.NewExecutableSchema(c))
