@@ -28,13 +28,13 @@ input CreateHabitInput {
 
 extend type Query {
     getHabits: [Habit]
-    getHabit(id: ID!): Habit
+    getHabit(id: ID!, userId: ID!): Habit
 }
 
 extend type Mutation {
-    createHabit(input: CreateHabitInput): Habit
+    createHabit(input: CreateHabitInput!, userId: ID!): Habit
     updateHabit(id: ID!, input: CreateHabitInput): Habit
-    deleteHabit(id: ID!): Habit
-    completeHabit(id: ID!): Habit
-    skipHabit(id: ID!): Habit
+    deleteHabit(id: ID!, userId: ID!): Habit
+    completeHabit(id: ID!, userId: ID!): Habit
+    skipHabit(id: ID!, userId: ID!): Habit
 }
