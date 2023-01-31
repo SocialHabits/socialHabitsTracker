@@ -62,7 +62,7 @@ func main() {
 		panic(err)
 	}
 
-	err = db.AutoMigrate(&models.Book{}, &models.User{}, &models.Address{}, &models.Mood{})
+	err = db.AutoMigrate(&models.Book{}, &models.User{}, &models.Address{}, &models.Mood{}, &models.Habit{})
 
 	if err != nil {
 		fmt.Printf("Error while migrating: %v", err)
