@@ -18,7 +18,7 @@ type Habit {
     userId: ID
 }
 
-type CreateHabitInput {
+input CreateHabitInput {
     name: String!
     goal: Int
     startDate: String!

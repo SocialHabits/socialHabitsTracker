@@ -35,12 +35,36 @@ type BookInput struct {
 	Publisher string `json:"publisher"`
 }
 
+type CreateHabitInput struct {
+	Name      string    `json:"name"`
+	Goal      *int      `json:"goal"`
+	StartDate string    `json:"startDate"`
+	EndDate   string    `json:"endDate"`
+	Type      HabitType `json:"type"`
+}
+
 type CurrentUser struct {
-	ID        int     `json:"id"`
-	FirstName string  `json:"firstName"`
-	LastName  string  `json:"lastName"`
-	Role      Role    `json:"role"`
-	Mood      []*Mood `json:"mood"`
+	ID        int      `json:"id"`
+	FirstName string   `json:"firstName"`
+	LastName  string   `json:"lastName"`
+	Role      Role     `json:"role"`
+	Mood      []*Mood  `json:"mood"`
+	Habit     []*Habit `json:"habit"`
+}
+
+type Habit struct {
+	ID        int       `json:"id"`
+	Name      string    `json:"name"`
+	Skipped   int       `json:"skipped"`
+	Completed int       `json:"completed"`
+	Streak    int       `json:"streak"`
+	Failed    int       `json:"failed"`
+	Total     int       `json:"total"`
+	Goal      int       `json:"goal"`
+	StartDate string    `json:"startDate"`
+	EndDate   string    `json:"endDate"`
+	Type      HabitType `json:"type"`
+	UserID    *int      `json:"userId"`
 }
 
 type LoginInput struct {
@@ -106,6 +130,47 @@ type UserInput struct {
 	Password  string          `json:"password"`
 	Address   []*AddressInput `json:"address"`
 	Role      Role            `json:"role"`
+}
+
+type HabitType string
+
+const (
+	HabitTypePreset      HabitType = "PRESET"
+	HabitTypeUserCreated HabitType = "USER_CREATED"
+)
+
+var AllHabitType = []HabitType{
+	HabitTypePreset,
+	HabitTypeUserCreated,
+}
+
+func (e HabitType) IsValid() bool {
+	switch e {
+	case HabitTypePreset, HabitTypeUserCreated:
+		return true
+	}
+	return false
+}
+
+func (e HabitType) String() string {
+	return string(e)
+}
+
+func (e *HabitType) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = HabitType(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid HabitType", str)
+	}
+	return nil
+}
+
+func (e HabitType) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
 type MoodIntensity string

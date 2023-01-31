@@ -63,10 +63,26 @@ type ComplexityRoot struct {
 
 	CurrentUser struct {
 		FirstName func(childComplexity int) int
+		Habit     func(childComplexity int) int
 		ID        func(childComplexity int) int
 		LastName  func(childComplexity int) int
 		Mood      func(childComplexity int) int
 		Role      func(childComplexity int) int
+	}
+
+	Habit struct {
+		Completed func(childComplexity int) int
+		EndDate   func(childComplexity int) int
+		Failed    func(childComplexity int) int
+		Goal      func(childComplexity int) int
+		ID        func(childComplexity int) int
+		Name      func(childComplexity int) int
+		Skipped   func(childComplexity int) int
+		StartDate func(childComplexity int) int
+		Streak    func(childComplexity int) int
+		Total     func(childComplexity int) int
+		Type      func(childComplexity int) int
+		UserID    func(childComplexity int) int
 	}
 
 	Mood struct {
@@ -78,24 +94,31 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		CreateBook func(childComplexity int, input customTypes.BookInput) int
-		CreateMood func(childComplexity int, input customTypes.MoodInput) int
-		CreateTodo func(childComplexity int, text string) int
-		CreateUser func(childComplexity int, input customTypes.UserInput) int
-		DeleteBook func(childComplexity int, id int) int
-		DeleteMood func(childComplexity int, id int) int
-		DeleteTodo func(childComplexity int, todoID int) int
-		DeleteUser func(childComplexity int, id int) int
-		Login      func(childComplexity int, input customTypes.LoginInput) int
-		UpdateBook func(childComplexity int, id int, input customTypes.BookInput) int
-		UpdateMood func(childComplexity int, id int, input *customTypes.UpdateMoodInput) int
-		UpdateTodo func(childComplexity int, input customTypes.TodoInput) int
-		UpdateUser func(childComplexity int, id int, input customTypes.UpdateUserInput) int
+		CompleteHabit func(childComplexity int, id int) int
+		CreateBook    func(childComplexity int, input customTypes.BookInput) int
+		CreateHabit   func(childComplexity int, input *customTypes.CreateHabitInput) int
+		CreateMood    func(childComplexity int, input customTypes.MoodInput) int
+		CreateTodo    func(childComplexity int, text string) int
+		CreateUser    func(childComplexity int, input customTypes.UserInput) int
+		DeleteBook    func(childComplexity int, id int) int
+		DeleteHabit   func(childComplexity int, id int) int
+		DeleteMood    func(childComplexity int, id int) int
+		DeleteTodo    func(childComplexity int, todoID int) int
+		DeleteUser    func(childComplexity int, id int) int
+		Login         func(childComplexity int, input customTypes.LoginInput) int
+		SkipHabit     func(childComplexity int, id int) int
+		UpdateBook    func(childComplexity int, id int, input customTypes.BookInput) int
+		UpdateHabit   func(childComplexity int, id int, input *customTypes.CreateHabitInput) int
+		UpdateMood    func(childComplexity int, id int, input *customTypes.UpdateMoodInput) int
+		UpdateTodo    func(childComplexity int, input customTypes.TodoInput) int
+		UpdateUser    func(childComplexity int, id int, input customTypes.UpdateUserInput) int
 	}
 
 	Query struct {
 		GetAllBooks    func(childComplexity int) int
 		GetCurrentUser func(childComplexity int, id int) int
+		GetHabit       func(childComplexity int, id int) int
+		GetHabits      func(childComplexity int) int
 		GetMood        func(childComplexity int, id int) int
 		GetMoods       func(childComplexity int) int
 		GetOneBook     func(childComplexity int, id int) int
@@ -129,6 +152,11 @@ type MutationResolver interface {
 	CreateBook(ctx context.Context, input customTypes.BookInput) (*customTypes.Book, error)
 	DeleteBook(ctx context.Context, id int) (string, error)
 	UpdateBook(ctx context.Context, id int, input customTypes.BookInput) (string, error)
+	CreateHabit(ctx context.Context, input *customTypes.CreateHabitInput) (*customTypes.Habit, error)
+	UpdateHabit(ctx context.Context, id int, input *customTypes.CreateHabitInput) (*customTypes.Habit, error)
+	DeleteHabit(ctx context.Context, id int) (*customTypes.Habit, error)
+	CompleteHabit(ctx context.Context, id int) (*customTypes.Habit, error)
+	SkipHabit(ctx context.Context, id int) (*customTypes.Habit, error)
 	CreateMood(ctx context.Context, input customTypes.MoodInput) (*customTypes.Mood, error)
 	UpdateMood(ctx context.Context, id int, input *customTypes.UpdateMoodInput) (string, error)
 	DeleteMood(ctx context.Context, id int) (bool, error)
@@ -142,6 +170,8 @@ type QueryResolver interface {
 	GetTodo(ctx context.Context, todoID int) (*customTypes.Todo, error)
 	GetAllBooks(ctx context.Context) ([]*customTypes.Book, error)
 	GetOneBook(ctx context.Context, id int) (*customTypes.Book, error)
+	GetHabits(ctx context.Context) ([]*customTypes.Habit, error)
+	GetHabit(ctx context.Context, id int) (*customTypes.Habit, error)
 	GetMoods(ctx context.Context) ([]*customTypes.Mood, error)
 	GetMood(ctx context.Context, id int) (*customTypes.Mood, error)
 	GetCurrentUser(ctx context.Context, id int) (*customTypes.CurrentUser, error)
@@ -234,6 +264,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.CurrentUser.FirstName(childComplexity), true
 
+	case "CurrentUser.habit":
+		if e.complexity.CurrentUser.Habit == nil {
+			break
+		}
+
+		return e.complexity.CurrentUser.Habit(childComplexity), true
+
 	case "CurrentUser.id":
 		if e.complexity.CurrentUser.ID == nil {
 			break
@@ -261,6 +298,90 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.CurrentUser.Role(childComplexity), true
+
+	case "Habit.completed":
+		if e.complexity.Habit.Completed == nil {
+			break
+		}
+
+		return e.complexity.Habit.Completed(childComplexity), true
+
+	case "Habit.endDate":
+		if e.complexity.Habit.EndDate == nil {
+			break
+		}
+
+		return e.complexity.Habit.EndDate(childComplexity), true
+
+	case "Habit.failed":
+		if e.complexity.Habit.Failed == nil {
+			break
+		}
+
+		return e.complexity.Habit.Failed(childComplexity), true
+
+	case "Habit.goal":
+		if e.complexity.Habit.Goal == nil {
+			break
+		}
+
+		return e.complexity.Habit.Goal(childComplexity), true
+
+	case "Habit.id":
+		if e.complexity.Habit.ID == nil {
+			break
+		}
+
+		return e.complexity.Habit.ID(childComplexity), true
+
+	case "Habit.name":
+		if e.complexity.Habit.Name == nil {
+			break
+		}
+
+		return e.complexity.Habit.Name(childComplexity), true
+
+	case "Habit.skipped":
+		if e.complexity.Habit.Skipped == nil {
+			break
+		}
+
+		return e.complexity.Habit.Skipped(childComplexity), true
+
+	case "Habit.startDate":
+		if e.complexity.Habit.StartDate == nil {
+			break
+		}
+
+		return e.complexity.Habit.StartDate(childComplexity), true
+
+	case "Habit.streak":
+		if e.complexity.Habit.Streak == nil {
+			break
+		}
+
+		return e.complexity.Habit.Streak(childComplexity), true
+
+	case "Habit.total":
+		if e.complexity.Habit.Total == nil {
+			break
+		}
+
+		return e.complexity.Habit.Total(childComplexity), true
+
+	case "Habit.type":
+		if e.complexity.Habit.Type == nil {
+			break
+		}
+
+		return e.complexity.Habit.Type(childComplexity), true
+
+	case "Habit.userId":
+		if e.complexity.Habit.UserID == nil {
+			break
+		}
+
+		return e.complexity.Habit.UserID(childComplexity), true
 
 	case "Mood.id":
 		if e.complexity.Mood.ID == nil {
@@ -297,6 +418,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mood.UserID(childComplexity), true
 
+	case "Mutation.completeHabit":
+		if e.complexity.Mutation.CompleteHabit == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_completeHabit_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CompleteHabit(childComplexity, args["id"].(int)), true
+
 	case "Mutation.CreateBook":
 		if e.complexity.Mutation.CreateBook == nil {
 			break
@@ -308,6 +441,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.CreateBook(childComplexity, args["input"].(customTypes.BookInput)), true
+
+	case "Mutation.createHabit":
+		if e.complexity.Mutation.CreateHabit == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createHabit_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateHabit(childComplexity, args["input"].(*customTypes.CreateHabitInput)), true
 
 	case "Mutation.createMood":
 		if e.complexity.Mutation.CreateMood == nil {
@@ -357,6 +502,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.DeleteBook(childComplexity, args["id"].(int)), true
 
+	case "Mutation.deleteHabit":
+		if e.complexity.Mutation.DeleteHabit == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteHabit_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteHabit(childComplexity, args["id"].(int)), true
+
 	case "Mutation.deleteMood":
 		if e.complexity.Mutation.DeleteMood == nil {
 			break
@@ -405,6 +562,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.Login(childComplexity, args["input"].(customTypes.LoginInput)), true
 
+	case "Mutation.skipHabit":
+		if e.complexity.Mutation.SkipHabit == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_skipHabit_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.SkipHabit(childComplexity, args["id"].(int)), true
+
 	case "Mutation.UpdateBook":
 		if e.complexity.Mutation.UpdateBook == nil {
 			break
@@ -416,6 +585,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.UpdateBook(childComplexity, args["id"].(int), args["input"].(customTypes.BookInput)), true
+
+	case "Mutation.updateHabit":
+		if e.complexity.Mutation.UpdateHabit == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateHabit_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateHabit(childComplexity, args["id"].(int), args["input"].(*customTypes.CreateHabitInput)), true
 
 	case "Mutation.updateMood":
 		if e.complexity.Mutation.UpdateMood == nil {
@@ -471,6 +652,25 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.GetCurrentUser(childComplexity, args["id"].(int)), true
+
+	case "Query.getHabit":
+		if e.complexity.Query.GetHabit == nil {
+			break
+		}
+
+		args, err := ec.field_Query_getHabit_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetHabit(childComplexity, args["id"].(int)), true
+
+	case "Query.getHabits":
+		if e.complexity.Query.GetHabits == nil {
+			break
+		}
+
+		return e.complexity.Query.GetHabits(childComplexity), true
 
 	case "Query.getMood":
 		if e.complexity.Query.GetMood == nil {
@@ -621,6 +821,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputAddressInput,
 		ec.unmarshalInputBookInput,
+		ec.unmarshalInputCreateHabitInput,
 		ec.unmarshalInputLoginInput,
 		ec.unmarshalInputMoodInput,
 		ec.unmarshalInputRoleInput,
@@ -687,7 +888,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 	return introspection.WrapTypeFromDef(parsedSchema, parsedSchema.Types[name]), nil
 }
 
-//go:embed "typeDefs/books.graphql" "typeDefs/mood.graphql" "typeDefs/schema.graphql" "typeDefs/todo.graphql" "typeDefs/user.graphql"
+//go:embed "typeDefs/books.graphql" "typeDefs/habit.graphql" "typeDefs/mood.graphql" "typeDefs/schema.graphql" "typeDefs/todo.graphql" "typeDefs/user.graphql"
 var sourcesFS embed.FS
 
 func sourceData(filename string) string {
@@ -700,6 +901,7 @@ func sourceData(filename string) string {
 
 var sources = []*ast.Source{
 	{Name: "typeDefs/books.graphql", Input: sourceData("typeDefs/books.graphql"), BuiltIn: false},
+	{Name: "typeDefs/habit.graphql", Input: sourceData("typeDefs/habit.graphql"), BuiltIn: false},
 	{Name: "typeDefs/mood.graphql", Input: sourceData("typeDefs/mood.graphql"), BuiltIn: false},
 	{Name: "typeDefs/schema.graphql", Input: sourceData("typeDefs/schema.graphql"), BuiltIn: false},
 	{Name: "typeDefs/todo.graphql", Input: sourceData("typeDefs/todo.graphql"), BuiltIn: false},
@@ -780,6 +982,36 @@ func (ec *executionContext) field_Mutation_UpdateBook_args(ctx context.Context, 
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_completeHabit_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 int
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_createHabit_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *customTypes.CreateHabitInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalOCreateHabitInput2ᚖgithubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐCreateHabitInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_createMood_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -822,6 +1054,21 @@ func (ec *executionContext) field_Mutation_createUser_args(ctx context.Context, 
 		}
 	}
 	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteHabit_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 int
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
 	return args, nil
 }
 
@@ -882,6 +1129,45 @@ func (ec *executionContext) field_Mutation_login_args(ctx context.Context, rawAr
 		}
 	}
 	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_skipHabit_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 int
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateHabit_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 int
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	var arg1 *customTypes.CreateHabitInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg1, err = ec.unmarshalOCreateHabitInput2ᚖgithubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐCreateHabitInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg1
 	return args, nil
 }
 
@@ -979,6 +1265,21 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 }
 
 func (ec *executionContext) field_Query_getCurrentUser_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 int
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_getHabit_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 int
@@ -1701,6 +2002,598 @@ func (ec *executionContext) fieldContext_CurrentUser_mood(ctx context.Context, f
 	return fc, nil
 }
 
+func (ec *executionContext) _CurrentUser_habit(ctx context.Context, field graphql.CollectedField, obj *customTypes.CurrentUser) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CurrentUser_habit(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Habit, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*customTypes.Habit)
+	fc.Result = res
+	return ec.marshalOHabit2ᚕᚖgithubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐHabit(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CurrentUser_habit(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CurrentUser",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Habit_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Habit_name(ctx, field)
+			case "skipped":
+				return ec.fieldContext_Habit_skipped(ctx, field)
+			case "completed":
+				return ec.fieldContext_Habit_completed(ctx, field)
+			case "streak":
+				return ec.fieldContext_Habit_streak(ctx, field)
+			case "failed":
+				return ec.fieldContext_Habit_failed(ctx, field)
+			case "total":
+				return ec.fieldContext_Habit_total(ctx, field)
+			case "goal":
+				return ec.fieldContext_Habit_goal(ctx, field)
+			case "startDate":
+				return ec.fieldContext_Habit_startDate(ctx, field)
+			case "endDate":
+				return ec.fieldContext_Habit_endDate(ctx, field)
+			case "type":
+				return ec.fieldContext_Habit_type(ctx, field)
+			case "userId":
+				return ec.fieldContext_Habit_userId(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Habit", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Habit_id(ctx context.Context, field graphql.CollectedField, obj *customTypes.Habit) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Habit_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNID2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Habit_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Habit",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Habit_name(ctx context.Context, field graphql.CollectedField, obj *customTypes.Habit) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Habit_name(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Habit_name(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Habit",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Habit_skipped(ctx context.Context, field graphql.CollectedField, obj *customTypes.Habit) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Habit_skipped(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Skipped, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Habit_skipped(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Habit",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Habit_completed(ctx context.Context, field graphql.CollectedField, obj *customTypes.Habit) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Habit_completed(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Completed, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Habit_completed(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Habit",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Habit_streak(ctx context.Context, field graphql.CollectedField, obj *customTypes.Habit) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Habit_streak(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Streak, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Habit_streak(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Habit",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Habit_failed(ctx context.Context, field graphql.CollectedField, obj *customTypes.Habit) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Habit_failed(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Failed, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Habit_failed(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Habit",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Habit_total(ctx context.Context, field graphql.CollectedField, obj *customTypes.Habit) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Habit_total(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Total, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Habit_total(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Habit",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Habit_goal(ctx context.Context, field graphql.CollectedField, obj *customTypes.Habit) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Habit_goal(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Goal, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Habit_goal(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Habit",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Habit_startDate(ctx context.Context, field graphql.CollectedField, obj *customTypes.Habit) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Habit_startDate(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.StartDate, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Habit_startDate(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Habit",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Habit_endDate(ctx context.Context, field graphql.CollectedField, obj *customTypes.Habit) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Habit_endDate(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.EndDate, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Habit_endDate(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Habit",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Habit_type(ctx context.Context, field graphql.CollectedField, obj *customTypes.Habit) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Habit_type(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Type, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(customTypes.HabitType)
+	fc.Result = res
+	return ec.marshalNHabitType2githubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐHabitType(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Habit_type(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Habit",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type HabitType does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Habit_userId(ctx context.Context, field graphql.CollectedField, obj *customTypes.Habit) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Habit_userId(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UserID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOID2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Habit_userId(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Habit",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Mood_id(ctx context.Context, field graphql.CollectedField, obj *customTypes.Mood) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mood_id(ctx, field)
 	if err != nil {
@@ -2276,6 +3169,396 @@ func (ec *executionContext) fieldContext_Mutation_UpdateBook(ctx context.Context
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_UpdateBook_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_createHabit(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_createHabit(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CreateHabit(rctx, fc.Args["input"].(*customTypes.CreateHabitInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*customTypes.Habit)
+	fc.Result = res
+	return ec.marshalOHabit2ᚖgithubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐHabit(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_createHabit(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Habit_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Habit_name(ctx, field)
+			case "skipped":
+				return ec.fieldContext_Habit_skipped(ctx, field)
+			case "completed":
+				return ec.fieldContext_Habit_completed(ctx, field)
+			case "streak":
+				return ec.fieldContext_Habit_streak(ctx, field)
+			case "failed":
+				return ec.fieldContext_Habit_failed(ctx, field)
+			case "total":
+				return ec.fieldContext_Habit_total(ctx, field)
+			case "goal":
+				return ec.fieldContext_Habit_goal(ctx, field)
+			case "startDate":
+				return ec.fieldContext_Habit_startDate(ctx, field)
+			case "endDate":
+				return ec.fieldContext_Habit_endDate(ctx, field)
+			case "type":
+				return ec.fieldContext_Habit_type(ctx, field)
+			case "userId":
+				return ec.fieldContext_Habit_userId(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Habit", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_createHabit_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updateHabit(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updateHabit(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateHabit(rctx, fc.Args["id"].(int), fc.Args["input"].(*customTypes.CreateHabitInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*customTypes.Habit)
+	fc.Result = res
+	return ec.marshalOHabit2ᚖgithubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐHabit(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateHabit(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Habit_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Habit_name(ctx, field)
+			case "skipped":
+				return ec.fieldContext_Habit_skipped(ctx, field)
+			case "completed":
+				return ec.fieldContext_Habit_completed(ctx, field)
+			case "streak":
+				return ec.fieldContext_Habit_streak(ctx, field)
+			case "failed":
+				return ec.fieldContext_Habit_failed(ctx, field)
+			case "total":
+				return ec.fieldContext_Habit_total(ctx, field)
+			case "goal":
+				return ec.fieldContext_Habit_goal(ctx, field)
+			case "startDate":
+				return ec.fieldContext_Habit_startDate(ctx, field)
+			case "endDate":
+				return ec.fieldContext_Habit_endDate(ctx, field)
+			case "type":
+				return ec.fieldContext_Habit_type(ctx, field)
+			case "userId":
+				return ec.fieldContext_Habit_userId(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Habit", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateHabit_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deleteHabit(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_deleteHabit(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteHabit(rctx, fc.Args["id"].(int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*customTypes.Habit)
+	fc.Result = res
+	return ec.marshalOHabit2ᚖgithubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐHabit(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deleteHabit(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Habit_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Habit_name(ctx, field)
+			case "skipped":
+				return ec.fieldContext_Habit_skipped(ctx, field)
+			case "completed":
+				return ec.fieldContext_Habit_completed(ctx, field)
+			case "streak":
+				return ec.fieldContext_Habit_streak(ctx, field)
+			case "failed":
+				return ec.fieldContext_Habit_failed(ctx, field)
+			case "total":
+				return ec.fieldContext_Habit_total(ctx, field)
+			case "goal":
+				return ec.fieldContext_Habit_goal(ctx, field)
+			case "startDate":
+				return ec.fieldContext_Habit_startDate(ctx, field)
+			case "endDate":
+				return ec.fieldContext_Habit_endDate(ctx, field)
+			case "type":
+				return ec.fieldContext_Habit_type(ctx, field)
+			case "userId":
+				return ec.fieldContext_Habit_userId(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Habit", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deleteHabit_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_completeHabit(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_completeHabit(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CompleteHabit(rctx, fc.Args["id"].(int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*customTypes.Habit)
+	fc.Result = res
+	return ec.marshalOHabit2ᚖgithubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐHabit(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_completeHabit(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Habit_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Habit_name(ctx, field)
+			case "skipped":
+				return ec.fieldContext_Habit_skipped(ctx, field)
+			case "completed":
+				return ec.fieldContext_Habit_completed(ctx, field)
+			case "streak":
+				return ec.fieldContext_Habit_streak(ctx, field)
+			case "failed":
+				return ec.fieldContext_Habit_failed(ctx, field)
+			case "total":
+				return ec.fieldContext_Habit_total(ctx, field)
+			case "goal":
+				return ec.fieldContext_Habit_goal(ctx, field)
+			case "startDate":
+				return ec.fieldContext_Habit_startDate(ctx, field)
+			case "endDate":
+				return ec.fieldContext_Habit_endDate(ctx, field)
+			case "type":
+				return ec.fieldContext_Habit_type(ctx, field)
+			case "userId":
+				return ec.fieldContext_Habit_userId(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Habit", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_completeHabit_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_skipHabit(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_skipHabit(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().SkipHabit(rctx, fc.Args["id"].(int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*customTypes.Habit)
+	fc.Result = res
+	return ec.marshalOHabit2ᚖgithubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐHabit(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_skipHabit(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Habit_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Habit_name(ctx, field)
+			case "skipped":
+				return ec.fieldContext_Habit_skipped(ctx, field)
+			case "completed":
+				return ec.fieldContext_Habit_completed(ctx, field)
+			case "streak":
+				return ec.fieldContext_Habit_streak(ctx, field)
+			case "failed":
+				return ec.fieldContext_Habit_failed(ctx, field)
+			case "total":
+				return ec.fieldContext_Habit_total(ctx, field)
+			case "goal":
+				return ec.fieldContext_Habit_goal(ctx, field)
+			case "startDate":
+				return ec.fieldContext_Habit_startDate(ctx, field)
+			case "endDate":
+				return ec.fieldContext_Habit_endDate(ctx, field)
+			case "type":
+				return ec.fieldContext_Habit_type(ctx, field)
+			case "userId":
+				return ec.fieldContext_Habit_userId(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Habit", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_skipHabit_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -2945,6 +4228,151 @@ func (ec *executionContext) fieldContext_Query_GetOneBook(ctx context.Context, f
 	return fc, nil
 }
 
+func (ec *executionContext) _Query_getHabits(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_getHabits(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().GetHabits(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*customTypes.Habit)
+	fc.Result = res
+	return ec.marshalOHabit2ᚕᚖgithubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐHabit(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_getHabits(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Habit_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Habit_name(ctx, field)
+			case "skipped":
+				return ec.fieldContext_Habit_skipped(ctx, field)
+			case "completed":
+				return ec.fieldContext_Habit_completed(ctx, field)
+			case "streak":
+				return ec.fieldContext_Habit_streak(ctx, field)
+			case "failed":
+				return ec.fieldContext_Habit_failed(ctx, field)
+			case "total":
+				return ec.fieldContext_Habit_total(ctx, field)
+			case "goal":
+				return ec.fieldContext_Habit_goal(ctx, field)
+			case "startDate":
+				return ec.fieldContext_Habit_startDate(ctx, field)
+			case "endDate":
+				return ec.fieldContext_Habit_endDate(ctx, field)
+			case "type":
+				return ec.fieldContext_Habit_type(ctx, field)
+			case "userId":
+				return ec.fieldContext_Habit_userId(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Habit", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_getHabit(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_getHabit(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().GetHabit(rctx, fc.Args["id"].(int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*customTypes.Habit)
+	fc.Result = res
+	return ec.marshalOHabit2ᚖgithubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐHabit(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_getHabit(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Habit_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Habit_name(ctx, field)
+			case "skipped":
+				return ec.fieldContext_Habit_skipped(ctx, field)
+			case "completed":
+				return ec.fieldContext_Habit_completed(ctx, field)
+			case "streak":
+				return ec.fieldContext_Habit_streak(ctx, field)
+			case "failed":
+				return ec.fieldContext_Habit_failed(ctx, field)
+			case "total":
+				return ec.fieldContext_Habit_total(ctx, field)
+			case "goal":
+				return ec.fieldContext_Habit_goal(ctx, field)
+			case "startDate":
+				return ec.fieldContext_Habit_startDate(ctx, field)
+			case "endDate":
+				return ec.fieldContext_Habit_endDate(ctx, field)
+			case "type":
+				return ec.fieldContext_Habit_type(ctx, field)
+			case "userId":
+				return ec.fieldContext_Habit_userId(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Habit", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_getHabit_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query_getMoods(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Query_getMoods(ctx, field)
 	if err != nil {
@@ -3117,6 +4545,8 @@ func (ec *executionContext) fieldContext_Query_getCurrentUser(ctx context.Contex
 				return ec.fieldContext_CurrentUser_role(ctx, field)
 			case "mood":
 				return ec.fieldContext_CurrentUser_mood(ctx, field)
+			case "habit":
+				return ec.fieldContext_CurrentUser_habit(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type CurrentUser", field.Name)
 		},
@@ -5692,6 +7122,66 @@ func (ec *executionContext) unmarshalInputBookInput(ctx context.Context, obj int
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputCreateHabitInput(ctx context.Context, obj interface{}) (customTypes.CreateHabitInput, error) {
+	var it customTypes.CreateHabitInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"name", "goal", "startDate", "endDate", "type"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "name":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			it.Name, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "goal":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("goal"))
+			it.Goal, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "startDate":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("startDate"))
+			it.StartDate, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "endDate":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("endDate"))
+			it.EndDate, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "type":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
+			it.Type, err = ec.unmarshalNHabitType2githubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐHabitType(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputLoginInput(ctx context.Context, obj interface{}) (customTypes.LoginInput, error) {
 	var it customTypes.LoginInput
 	asMap := map[string]interface{}{}
@@ -6147,6 +7637,112 @@ func (ec *executionContext) _CurrentUser(ctx context.Context, sel ast.SelectionS
 
 			out.Values[i] = ec._CurrentUser_mood(ctx, field, obj)
 
+		case "habit":
+
+			out.Values[i] = ec._CurrentUser_habit(ctx, field, obj)
+
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var habitImplementors = []string{"Habit"}
+
+func (ec *executionContext) _Habit(ctx context.Context, sel ast.SelectionSet, obj *customTypes.Habit) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, habitImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Habit")
+		case "id":
+
+			out.Values[i] = ec._Habit_id(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "name":
+
+			out.Values[i] = ec._Habit_name(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "skipped":
+
+			out.Values[i] = ec._Habit_skipped(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "completed":
+
+			out.Values[i] = ec._Habit_completed(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "streak":
+
+			out.Values[i] = ec._Habit_streak(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "failed":
+
+			out.Values[i] = ec._Habit_failed(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "total":
+
+			out.Values[i] = ec._Habit_total(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "goal":
+
+			out.Values[i] = ec._Habit_goal(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "startDate":
+
+			out.Values[i] = ec._Habit_startDate(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "endDate":
+
+			out.Values[i] = ec._Habit_endDate(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "type":
+
+			out.Values[i] = ec._Habit_type(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "userId":
+
+			out.Values[i] = ec._Habit_userId(ctx, field, obj)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -6284,6 +7880,36 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "createHabit":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createHabit(ctx, field)
+			})
+
+		case "updateHabit":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateHabit(ctx, field)
+			})
+
+		case "deleteHabit":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteHabit(ctx, field)
+			})
+
+		case "completeHabit":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_completeHabit(ctx, field)
+			})
+
+		case "skipHabit":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_skipHabit(ctx, field)
+			})
+
 		case "createMood":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
@@ -6459,6 +8085,46 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
+			})
+		case "getHabits":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getHabits(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
+			})
+		case "getHabit":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getHabit(ctx, field)
 				return res
 			}
 
@@ -7226,6 +8892,16 @@ func (ec *executionContext) marshalNCurrentUser2ᚖgithubᚗcomᚋAntonioTrupac�
 	return ec._CurrentUser(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalNHabitType2githubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐHabitType(ctx context.Context, v interface{}) (customTypes.HabitType, error) {
+	var res customTypes.HabitType
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNHabitType2githubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐHabitType(ctx context.Context, sel ast.SelectionSet, v customTypes.HabitType) graphql.Marshaler {
+	return v
+}
+
 func (ec *executionContext) unmarshalNID2int(ctx context.Context, v interface{}) (int, error) {
 	res, err := graphql.UnmarshalInt(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -7804,6 +9480,94 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 		return graphql.Null
 	}
 	res := graphql.MarshalBoolean(*v)
+	return res
+}
+
+func (ec *executionContext) unmarshalOCreateHabitInput2ᚖgithubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐCreateHabitInput(ctx context.Context, v interface{}) (*customTypes.CreateHabitInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputCreateHabitInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOHabit2ᚕᚖgithubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐHabit(ctx context.Context, sel ast.SelectionSet, v []*customTypes.Habit) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOHabit2ᚖgithubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐHabit(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
+func (ec *executionContext) marshalOHabit2ᚖgithubᚗcomᚋAntonioTrupacᚋsocialHabitsTrackerᚋgraphᚋcustomTypesᚐHabit(ctx context.Context, sel ast.SelectionSet, v *customTypes.Habit) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Habit(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOID2ᚖint(ctx context.Context, v interface{}) (*int, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := graphql.UnmarshalInt(v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOID2ᚖint(ctx context.Context, sel ast.SelectionSet, v *int) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	res := graphql.MarshalInt(*v)
+	return res
+}
+
+func (ec *executionContext) unmarshalOInt2ᚖint(ctx context.Context, v interface{}) (*int, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := graphql.UnmarshalInt(v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.SelectionSet, v *int) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	res := graphql.MarshalInt(*v)
 	return res
 }
 
