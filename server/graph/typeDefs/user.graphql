@@ -14,6 +14,7 @@ type CurrentUser {
     lastName: String!
     role: Role!
     mood: [Mood]
+    habit: [Habit]
 }
 
 enum Role {
