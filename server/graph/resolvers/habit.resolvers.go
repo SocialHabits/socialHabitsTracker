@@ -14,7 +14,7 @@ import (
 )
 
 // CreateHabit is the resolver for the createHabit field.
-func (r *mutationResolver) CreateHabit(ctx context.Context, input *customTypes.CreateHabitInput) (*customTypes.Habit, error) {
+func (r *mutationResolver) CreateHabit(ctx context.Context, input customTypes.CreateHabitInput) (*customTypes.Habit, error) {
 	userClaims := middleware.GetValFromCtx(ctx)
 
 	if userClaims == nil || userClaims.UserId == 0 || userClaims.IsLoggedIn == false {
@@ -33,7 +33,7 @@ func (r *mutationResolver) CreateHabit(ctx context.Context, input *customTypes.C
 
 	id := int(repoHabit.ID)
 
-	habit := &customTypes.Habit{
+	habit := customTypes.Habit{
 		ID:        int(repoHabit.ID),
 		Name:      repoHabit.Name,
 		Skipped:   repoHabit.Skipped,
@@ -42,13 +42,13 @@ func (r *mutationResolver) CreateHabit(ctx context.Context, input *customTypes.C
 		Failed:    repoHabit.Failed,
 		Total:     repoHabit.Total,
 		UserID:    &id,
-		Goal:      repoHabit.Goal,
-		// StartDate: repoHabit.StartDate,
-		// EndDate:   repoHabit.EndDate,
-		Type: customTypes.HabitType(repoHabit.Type),
+		Goal:      0,
+		StartDate: "",
+		EndDate:   "",
+		Type:      customTypes.HabitType(repoHabit.Type),
 	}
 
-	return habit, nil
+	return &habit, nil
 }
 
 // UpdateHabit is the resolver for the updateHabit field.

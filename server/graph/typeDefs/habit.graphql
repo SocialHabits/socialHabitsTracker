@@ -12,29 +12,29 @@ type Habit {
     failed: Int!
     total: Int!
     goal: Int!
-    startDate: String!
-    endDate: String!
+    startDate: Time!
+    endDate: Time!
     type: HabitType!
-    userId: ID
+    userId: Int
 }
 
 input CreateHabitInput {
     name: String!
     goal: Int
-    startDate: String!
-    endDate: String!
+    startDate: Time!
+    endDate: Time!
     type: HabitType!
 }
 
 extend type Query {
     getHabits: [Habit]
-    getHabit(id: ID!, userId: ID!): Habit
+    getHabit(id: ID!): Habit
 }
 
 extend type Mutation {
-    createHabit(input: CreateHabitInput!, userId: ID!): Habit
+    createHabit(input: CreateHabitInput!): Habit!
     updateHabit(id: ID!, input: CreateHabitInput): Habit
-    deleteHabit(id: ID!, userId: ID!): Habit
-    completeHabit(id: ID!, userId: ID!): Habit
-    skipHabit(id: ID!, userId: ID!): Habit
+    deleteHabit(id: ID!): Habit
+    completeHabit(id: ID!): Habit
+    skipHabit(id: ID!): Habit
 }

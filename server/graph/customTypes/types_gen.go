@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"strconv"
+	"time"
 )
 
 type Address struct {
@@ -38,8 +39,8 @@ type BookInput struct {
 type CreateHabitInput struct {
 	Name      string    `json:"name"`
 	Goal      *int      `json:"goal"`
-	StartDate string    `json:"startDate"`
-	EndDate   string    `json:"endDate"`
+	StartDate time.Time `json:"startDate"`
+	EndDate   time.Time `json:"endDate"`
 	Type      HabitType `json:"type"`
 }
 
@@ -88,18 +89,6 @@ type MoodInput struct {
 
 type RoleInput struct {
 	Name Role `json:"name"`
-}
-
-type Todo struct {
-	ID   int    `json:"id"`
-	Text string `json:"text"`
-	Done bool   `json:"done"`
-}
-
-type TodoInput struct {
-	ID   int    `json:"id"`
-	Text string `json:"text"`
-	Done bool   `json:"done"`
 }
 
 type UpdateMoodInput struct {

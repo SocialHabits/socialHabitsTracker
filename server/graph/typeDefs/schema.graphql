@@ -2,6 +2,8 @@ directive @goField(forceResolver: String, name: String) on FIELD_DEFINITION | IN
 directive @binding(constraint: String!) on INPUT_FIELD_DEFINITION | ARGUMENT_DEFINITION
 
 scalar Any
+scalar Time
+scalar DateTime
 
 schema {
     query: Query

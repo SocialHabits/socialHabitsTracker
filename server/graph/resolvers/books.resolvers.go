@@ -7,6 +7,7 @@ package graph
 import (
 	"context"
 
+	generated "github.com/AntonioTrupac/socialHabitsTracker/graph"
 	"github.com/AntonioTrupac/socialHabitsTracker/graph/customTypes"
 )
 
@@ -72,3 +73,12 @@ func (r *queryResolver) GetOneBook(ctx context.Context, id int) (*customTypes.Bo
 	}
 	return selectedBook, nil
 }
+
+// Mutation returns generated.MutationResolver implementation.
+func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
+
+// Query returns generated.QueryResolver implementation.
+func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
+
+type mutationResolver struct{ *Resolver }
+type queryResolver struct{ *Resolver }

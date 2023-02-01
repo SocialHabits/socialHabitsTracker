@@ -46,7 +46,7 @@ func (r *mutationResolver) CreateMood(ctx context.Context, input customTypes.Moo
 func (r *mutationResolver) UpdateMood(ctx context.Context, id int, input *customTypes.UpdateMoodInput) (string, error) {
 	userClaims := middleware.GetValFromCtx(ctx)
 
-	if userClaims == nil || userClaims.UserId == 0 || userClaims.IsLoggedIn == false {
+	if userClaims == nil || userClaims.UserId == 0 || !userClaims.IsLoggedIn {
 		return "", &gqlerror.Error{
 			Message: "User not authenticated",
 		}

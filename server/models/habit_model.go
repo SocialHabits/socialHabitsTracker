@@ -11,8 +11,8 @@ import (
 type HabitType string
 
 const (
-	Preset HabitType = "PRESET"
-	Custom HabitType = "CUSTOM"
+	Preset      HabitType = "PRESET"
+	UserCreated HabitType = "USER_CREATED"
 )
 
 func (h *HabitType) Scan(value interface{}) error {
@@ -32,18 +32,18 @@ func (h HabitType) Value() (driver.Value, error) {
 }
 
 type Habit struct {
-	ID        uint      `gorm:"primarykey"`
+	ID        uint64    `gorm:"primarykey" json:"id"`
 	Name      string    `gorm:"size:255;not null" json:"name"`
 	Skipped   int       `gorm:"not null" json:"skipped"`
-	Type      HabitType `gorm:"type:enum('PRESET','CUSTOM')" column:"type" json:"type"`
+	Type      HabitType `gorm:"type:enum('PRESET','USER_CREATED')" column:"type" json:"type"`
 	Completed int       `gorm:"not null" json:"completed"`
 	Streak    int       `gorm:"not null" json:"streak"`
 	Failed    int       `gorm:"not null" json:"failed"`
 	Total     int       `gorm:"not null" json:"total"`
-	Goal      int       `gorm:"not null" json:"goal"`
+	Goal      *int      `json:"goal"`
 	StartDate time.Time `gorm:"not null" json:"start_date"`
 	EndDate   time.Time `gorm:"not null" json:"end_date"`
-	UserId    *uint     `json:"user_id"`
+	UserId    *uint64   `json:"user_id"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	DeletedAt gorm.DeletedAt `gorm:"index"`
