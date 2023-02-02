@@ -35,7 +35,7 @@ func (h *HabitService) CreateHabit(habitInput customTypes.CreateHabitInput, user
 	habit := &models.Habit{
 		Name:      habitInput.Name,
 		Skipped:   0,
-		Type:      models.HabitType(habitInput.Type),
+		Type:      models.UserCreated,
 		Completed: 0,
 		Streak:    0,
 		Failed:    0,
@@ -46,25 +46,11 @@ func (h *HabitService) CreateHabit(habitInput customTypes.CreateHabitInput, user
 		UserId:    &id,
 	}
 
-	err := h.DB.Transaction(func(tx *gorm.DB) error {
-		err := tx.Where("name = ?", habitInput.Name).Find(&habit).Error
+	if habit.Type != models.UserCreated {
+		return nil, fmt.Errorf("habit type is not user created: %v", habit.Type)
+	}
 
-		// check if habit already exists
-		if err == nil {
-			return fmt.Errorf("habit already exists")
-		}
-
-		if habitInput.Type == "PRESET" {
-			fmt.Printf("cannot create a habit of type PRESET")
-			return fmt.Errorf("cannot create a habit of type PRESET")
-		}
-
-		if err := tx.Create(&habit).Error; err != nil {
-			return err
-		}
-
-		return nil
-	})
+	err := h.DB.Create(&habit).Error
 
 	if err != nil {
 		return nil, err

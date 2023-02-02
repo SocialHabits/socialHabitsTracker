@@ -41,7 +41,6 @@ type CreateHabitInput struct {
 	Goal      *int      `json:"goal"`
 	StartDate time.Time `json:"startDate"`
 	EndDate   time.Time `json:"endDate"`
-	Type      HabitType `json:"type"`
 }
 
 type CurrentUser struct {
@@ -62,8 +61,8 @@ type Habit struct {
 	Failed    int       `json:"failed"`
 	Total     int       `json:"total"`
 	Goal      int       `json:"goal"`
-	StartDate string    `json:"startDate"`
-	EndDate   string    `json:"endDate"`
+	StartDate time.Time `json:"startDate"`
+	EndDate   time.Time `json:"endDate"`
 	Type      HabitType `json:"type"`
 	UserID    *int      `json:"userId"`
 }

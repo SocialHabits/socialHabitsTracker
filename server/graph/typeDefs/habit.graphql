@@ -23,7 +23,6 @@ input CreateHabitInput {
     goal: Int
     startDate: Time!
     endDate: Time!
-    type: HabitType!
 }
 
 extend type Query {

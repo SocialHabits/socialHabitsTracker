@@ -43,8 +43,8 @@ func (r *mutationResolver) CreateHabit(ctx context.Context, input customTypes.Cr
 		Total:     repoHabit.Total,
 		UserID:    &id,
 		Goal:      0,
-		StartDate: "",
-		EndDate:   "",
+		StartDate: repoHabit.StartDate,
+		EndDate:   repoHabit.EndDate,
 		Type:      customTypes.HabitType(repoHabit.Type),
 	}
 
